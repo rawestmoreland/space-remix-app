@@ -24,6 +24,10 @@ export const meta: MetaFunction = () => {
       content:
         'Welcome to the most comprehensive space launch site in the world!',
     },
+    {
+      property: 'og:image',
+      content: 'https://launchlist.space/placeholder-rocket.jpg',
+    },
   ];
 };
 

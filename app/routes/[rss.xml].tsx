@@ -1,4 +1,4 @@
-import { LoaderFunction } from "@remix-run/cloudflare";
+import { LoaderFunction } from '@remix-run/node';
 
 export type RssPost = {
   title: string;
@@ -35,7 +35,7 @@ export function generateRss({
         <link>${link}</link>
         <language>en-us</language>
         <ttl>60</ttl>
-        <atom:link href="https://keith.is/rss.xml" rel="self" type="application/rss+xml" />`;
+        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/rss+xml" />`;
 
   const rssBody = posts
     .map(
@@ -46,9 +46,9 @@ export function generateRss({
             <pubDate>${post.pubDate}</pubDate>
             <link>${post.link}</link>
             <guid isPermaLink="false">${post.link}</guid>
-          </item>`,
+          </item>`
     )
-    .join("");
+    .join('');
 
   const rssFooter = `
       </channel>
@@ -60,19 +60,19 @@ export function generateRss({
 export const loader: LoaderFunction = async () => {
   const posts = [
     {
-      title: "Hello, world!",
-      slug: "hello-world",
-      pubDate: "2022-01-01",
-      description: "This is my first post.",
-      excerpt: "This is my first post.",
-      guid: "https://keith.is/post/hello-world",
-      author: "Keith",
+      title: 'Hello, world!',
+      slug: 'hello-world',
+      pubDate: '2022-01-01',
+      description: 'This is my first post.',
+      excerpt: 'This is my first post.',
+      guid: 'https://keith.is/post/hello-world',
+      author: 'Keith',
     },
   ];
   const feed = generateRss({
     title: "Keith's Blog",
-    description: "A blog about web development and other things.",
-    link: "https://keith.is",
+    description: 'A blog about web development and other things.',
+    link: 'https://keith.is',
     posts: posts.map((post) => ({
       title: post.title,
       link: `https://keith.is/post/${post.slug}`,
@@ -83,8 +83,8 @@ export const loader: LoaderFunction = async () => {
 
   return new Response(feed, {
     headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "public, max-age=2419200",
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, max-age=2419200',
     },
   });
 };
