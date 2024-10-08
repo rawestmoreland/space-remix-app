@@ -1,5 +1,11 @@
 import { ActionFunctionArgs } from '@remix-run/node';
-import { json, useFetcher, type MetaFunction } from '@remix-run/react';
+import {
+  json,
+  useFetcher,
+  useLoaderData,
+  type MetaFunction,
+} from '@remix-run/react';
+import axios, { AxiosError, isAxiosError } from 'axios';
 import {
   CalendarIcon,
   ChevronRightIcon,
@@ -13,7 +19,11 @@ import { Testimonial } from '~/components/testimonial';
 import { AnimatedSubscribeButton } from '~/components/ui/animated-subscribe-button';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import Marquee from '~/components/ui/marquee';
 import { ITestimonial, testimonials } from '~/lib/constants';
+import { cn } from '~/lib/utils';
+import { getLaunches, ILaunch } from '~/services/launchService';
+import { IArticle } from '~/services/newsService';
 import { createContact } from '~/services/sendfoxService';
 
 export const meta: MetaFunction = () => {
@@ -31,6 +41,35 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.spaceflightnewsapi.net/v4/articles?limit=7&ordering=published`
+    );
+    const { data, error } = await getLaunches(
+      `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
+    );
+    return json({
+      articles: response.data.results,
+      launches: error ? null : data.results,
+      error: null,
+    });
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      return json({
+        articles: null,
+        launches: null,
+        error:
+          axiosError.response?.data ||
+          axiosError.message ||
+          'An error occurred',
+      });
+    }
+    return json({ articles: null, launches: null, error: 'An error occurred' });
+  }
+};
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const email = formData.get('email') as string;
@@ -42,6 +81,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Index() {
+  const { articles, launches } = useLoaderData<typeof loader>();
   const formRef = useRef<HTMLFormElement>(null);
   const fetcher = useFetcher<typeof action>();
   const [displayFormSuccess, setDisplayFormSuccess] = useState(false);
@@ -111,6 +151,34 @@ export default function Index() {
               </p>
             </div>
           </div>
+          {!!articles.length && (
+            <Marquee pauseOnHover className='[--duration:40s] mt-8'>
+              {articles.map((article: IArticle) => (
+                <ArticleCard
+                  key={article.id}
+                  url={article.url}
+                  img={article.image_url}
+                  title={article.title}
+                  summary={article.summary}
+                  outlet={article.news_site}
+                />
+              ))}
+            </Marquee>
+          )}
+          {!!launches.length && (
+            <Marquee reverse pauseOnHover className='[--duration:40s]'>
+              {launches.map((launch: ILaunch) => (
+                <ArticleCard
+                  key={launch.id}
+                  url='#'
+                  img={launch.image.image_url ?? '/placeholder-rocket.jpg'}
+                  title={launch.mission?.name ?? 'Unknown'}
+                  summary={launch.mission?.description ?? 'No description'}
+                  outlet={launch.program?.[0]?.name ?? 'Unknown agency'}
+                />
+              ))}
+            </Marquee>
+          )}
         </div>
       </section>
       <FormSuccessDialog
@@ -266,3 +334,43 @@ export default function Index() {
     </main>
   );
 }
+
+const ArticleCard = ({
+  img,
+  title,
+  outlet,
+  summary,
+  url,
+}: {
+  img: string;
+  title: string;
+  outlet: string;
+  summary: string;
+  url: string;
+}) => {
+  return (
+    <a
+      href={url}
+      target='_blank'
+      rel='noopener noreferrer'
+      className={cn(
+        'relative w-64 cursor-pointer overflow-hidden rounded-xl border p-4',
+        // light styles
+        'border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]',
+        // dark styles
+        'dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]'
+      )}
+    >
+      <div className='flex flex-row items-center gap-2'>
+        <img className='rounded-full w-8 h-8' alt='' src={img} />
+        <div className='flex flex-col'>
+          <figcaption className='text-sm font-medium dark:text-white'>
+            {title}
+          </figcaption>
+          <p className='text-xs font-medium dark:text-white/40'>{outlet}</p>
+        </div>
+      </div>
+      <blockquote className='mt-2 text-sm line-clamp-3'>{summary}</blockquote>
+    </a>
+  );
+};

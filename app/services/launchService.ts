@@ -6,6 +6,7 @@ export interface ILaunch {
   name: string;
   next?: string;
   previous?: string;
+  program: { name: string }[];
   rocket: {
     configuration: {
       name: string;
