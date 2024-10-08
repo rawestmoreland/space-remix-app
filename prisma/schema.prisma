@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id                        Int    @id @default(autoincrement())
+  name                      String
+  aplha_2_code              String
+  alpha_3_code              String
+  nationality_name          String
+  nationality_name_composed String
+}
+
+model MissionType {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Launch {
+  id             Int           @id @default(autoincrement())
+  source         String
+  url            String
+  slug           String
+  name           String
+  net            DateTime
+  netPrecisionId Int?
+  netPrecision   NetPrecision? @relation(fields: [netPrecisionId], references: [id])
+  imageId        Int?
+  image          Image?        @relation(fields: [imageId], references: [id])
+  statusId       Int
+  status         LaunchStatus  @relation(fields: [statusId], references: [id])
+}
+
+model LauncherConfiguration {
+  id          Int      @id @default(autoincrement())
+  name        String
+  full_name   String
+  description String
+  url         String
+  info_url    String
+  wiki_url    String
+  imageId     Int?
+  active      Boolean
+  programId   Int?
+  program     Program? @relation(fields: [programId], references: [id])
+  image       Image?   @relation(fields: [imageId], references: [id])
+}
+
+model Image {
+  id            Int      @id @default(autoincrement())
+  name          String
+  image_url     String
+  thumbnail_url String
+  credit        String?
+  single_use    Boolean?
+
+  Launches              Launch[]
+  Missions              Mission[]
+  LancherConfigurations LauncherConfiguration[]
+  Programs              Program[]
+}
+
+model Program {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String?
+  url         String
+  info_url    String?
+  wiki_url    String?
+  start_date  DateTime?
+  end_date    DateTime?
+  imageId     Int?
+  image       Image?        @relation(fields: [imageId], references: [id])
+  type        ProgramType[]
+
+  MissionPatches         MissionPatch[]
+  LauncherConfigurations LauncherConfiguration[]
+}
+
+model ProgramType {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  Programs Program[]
+}
+
+model Mission {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  type        String
+  imageId     Int?
+  image       Image?   @relation(fields: [imageId], references: [id])
+  agencies    Agency[]
+}
+
+model LaunchStatus {
+  id          Int    @id @default(autoincrement())
+  name        String
+  abbrev      String
+  description String
+
+  Launches Launch[]
+}
+
+model NetPrecision {
+  id          Int    @id @default(autoincrement())
+  name        String
+  abbrev      String
+  description String
+
+  Launches Launch[]
+}
+
+model MissionPatch {
+  id        Int     @id @default(autoincrement())
+  name      String
+  image_url String
+  priority  Int
+  agencyId  Int?
+  agency    Agency? @relation(fields: [agencyId], references: [id])
+
+  Program Program[]
+}
+
+model Agency {
+  id           Int         @id @default(autoincrement())
+  name         String
+  url          String?
+  abbrev       String
+  agencyTypeId Int?
+  agencyType   AgencyType? @relation(fields: [agencyTypeId], references: [id])
+
+  MissionPatches MissionPatch[]
+  Missions       Mission[]
+}
+
+model AgencyType {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  Agencies Agency[]
+}
