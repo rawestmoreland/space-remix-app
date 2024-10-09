@@ -1,9 +1,11 @@
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from '@remix-run/react';
 
 import './tailwind.css';
@@ -11,6 +13,9 @@ import { Header } from './components/header';
 // import { Footer } from './components/footer';
 import LoadingMask from './components/loading-mask';
 import { LinksFunction } from '@remix-run/react/dist/routeModules';
+import Particles from './components/ui/particles';
+import HyperText from './components/ui/hyper-text';
+import NumberTicker from './components/ui/number-ticker';
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -24,6 +29,117 @@ export const links: LinksFunction = () => [
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
   },
 ];
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    if (error.status === 404) {
+      return (
+        <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
+          <NumberTicker className='text-3xl font-bold mb-2' value={404} />
+          <img
+            className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
+            src='/not-found.jpg'
+            alt='Page not found'
+          />
+          <HyperText
+            className='text-2xl font-bold w-full flex flex-wrap'
+            text='OOPS!'
+          />
+          <HyperText
+            className='text-2xl font-bold'
+            text='THIS PAGE IS LOST IN SPACE'
+          />
+          <Particles
+            className='absolute inset-0'
+            quantity={500}
+            ease={80}
+            color='#000000'
+            refresh
+          />
+        </div>
+      );
+    }
+    return (
+      <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
+        <NumberTicker className='text-3xl font-bold mb-2' value={500} />
+        <img
+          className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
+          src='/error.jpg'
+          alt='Page not found'
+        />
+        <HyperText
+          className='text-2xl font-bold w-full flex flex-wrap'
+          text='OOPS!'
+        />
+        <HyperText
+          className='text-2xl font-bold'
+          text='SOMETHING HAS GONE WRONG'
+        />
+        <Particles
+          className='absolute inset-0'
+          quantity={500}
+          ease={80}
+          color='#000000'
+          refresh
+        />
+      </div>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
+        <NumberTicker className='text-3xl font-bold mb-2' value={500} />
+        <img
+          className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
+          src='/error.jpg'
+          alt='Page not found'
+        />
+        <HyperText
+          className='text-2xl font-bold w-full flex flex-wrap'
+          text='OOPS!'
+        />
+        <HyperText
+          className='text-2xl font-bold'
+          text='SOMETHING HAS GONE WRONG'
+        />
+        <Particles
+          className='absolute inset-0'
+          quantity={500}
+          ease={80}
+          color='#000000'
+          refresh
+        />
+      </div>
+    );
+  } else {
+    return (
+      <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
+        <NumberTicker className='text-3xl font-bold mb-2' value={500} />
+        <img
+          className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
+          src='/error.jpg'
+          alt='Page not found'
+        />
+        <HyperText
+          className='text-2xl font-bold w-full flex flex-wrap'
+          text='OOPS!'
+        />
+        <HyperText
+          className='text-2xl font-bold'
+          text='SOMETHING HAS GONE WRONG'
+        />
+        <Particles
+          className='absolute inset-0'
+          quantity={500}
+          ease={80}
+          color='#000000'
+          refresh
+        />
+      </div>
+    );
+  }
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -48,7 +164,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <div className='flex min-h-screen flex-col justify-center'>
+        <div className='flex min-h-screen flex-col'>
           <Header />
           <LoadingMask />
           {children}
