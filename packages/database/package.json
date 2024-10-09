@@ -1,5 +1,5 @@
 {
-  "name": "space-remix-app",
+  "name": "database",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "lerna": "^8.1.8"
+    "prisma": "^5.20.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.20.0"
   }
 }

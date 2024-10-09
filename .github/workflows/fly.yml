@@ -3,11 +3,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'packages/remix-app/**'
+
 jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
     concurrency: deploy-group
+    defaults:
+      run:
+        working-directory: packages/remix-app
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
