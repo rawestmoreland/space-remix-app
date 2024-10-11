@@ -5,76 +5,32 @@ on:
       - main
 
 jobs:
-  build-remix-image:
-    name: Build remix image
-    runs-on: ubuntu-latest
-    concurrency: build-group
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Login to fly.io
-        uses: superfly/flyctl-actions/setup-flyctl@master
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: packages/remix-app/Dockerfile
-          push: true
-          tags: registry.fly.io/remix-app:amd
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
   deploy-remix:
     name: Deploy remix app
-    needs: build-remix-image
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only --image registry.fly.io/remix-app:amd
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-  build-backend-image:
-    name: Build backend image
-    runs-on: ubuntu-latest
-    concurrency: build-group
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Login to fly.io
-        uses: superfly/flyctl-actions/setup-flyctl@master
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: packages/express-backend/Dockerfile
-          push: true
-          tags: registry.fly.io/launch-list-app-express-backend:amd
+      - run: flyctl deploy --remote-only --dockerfile Dockerfile.remix-app --config packages/remix-app/fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-backend:
     name: Deploy backend
-    needs: build-backend-image
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only --image registry.fly.io/launch-list-app-express-backend:amd
+      - run: flyctl deploy --remote-only --dockerfile Dockerfile.express-backend --config packages/express-backend/fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-trigger-dot-dev:
     name: Deploy trigger.dev
     runs-on: ubuntu-latest
-    needs: [deploy-backend, build-backend-image]
+    needs: [deploy-backend]
     concurrency: deploy-group
     defaults:
       run:
