@@ -7,7 +7,6 @@ app = 'launch-list-express-backend'
 primary_region = 'dfw'
 
 [build]
-  dockerfile = 'Dockerfile.express-backend'
 
 [http_service]
   internal_port = 8080
