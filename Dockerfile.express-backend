@@ -1,8 +1,5 @@
 FROM node:22.9.0-slim
 
-ENV DATABASE_URL=${DATABASE_URL}
-
-
 # Create app directory
 WORKDIR /app
 
@@ -22,7 +19,7 @@ RUN npm install -g lerna
 # Install app dependencies
 RUN npm install --include=dev
 
-RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
+RUN cd packages/database && npx prisma generate
 RUN cd packages/express-backend && npm run build
 
 WORKDIR /app/packages/express-backend
