@@ -77,9 +77,6 @@ importers:
       pino-http:
         specifier: ^10.0.0
         version: 10.3.0
-      prisma-json-types-generator:
-        specifier: ^3.1.1
-        version: 3.1.1(prisma@5.20.0)(typescript@5.6.3)
       swagger-ui-express:
         specifier: ^5.0.0
         version: 5.0.1(express@4.21.1)
@@ -253,9 +250,6 @@ importers:
       pg:
         specifier: ^8.13.0
         version: 8.13.0
-      prisma-json-types-generator:
-        specifier: ^3.1.1
-        version: 3.1.1(prisma@5.20.0)(typescript@5.6.3)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1502,9 +1496,6 @@ packages:
 
   '@prisma/fetch-engine@5.20.0':
     resolution: {integrity: sha512-JVcaPXC940wOGpCOwuqQRTz6I9SaBK0c1BAyC1pcz9xBi+dzFgUu3G/p9GV1FhFs9OKpfSpIhQfUJE9y00zhqw==}
-
-  '@prisma/generator-helper@5.20.0':
-    resolution: {integrity: sha512-37Aibw0wVRQgQVtCdNAIN71YFnSQfvetok7vd95KKkYkQRbEx94gsvPDpyN9Mw7p3IwA3nFgPfLc3jBRztUkKw==}
 
   '@prisma/get-platform@5.20.0':
     resolution: {integrity: sha512-8/+CehTZZNzJlvuryRgc77hZCWrUDYd/PmlZ7p2yNXtmf2Una4BWnTbak3us6WVdqoz5wmptk6IhsXdG2v5fmA==}
@@ -5516,14 +5507,6 @@ packages:
     resolution: {integrity: sha512-973driJZvxiGOQ5ONsFhOF/DtzPMOMtgC11kCpUrPGMTgqp2q/1gwzCquocrN33is0VZ5GFHXZYMM9l6h67v2Q==}
     engines: {node: '>=10'}
 
-  prisma-json-types-generator@3.1.1:
-    resolution: {integrity: sha512-LYVBKWcnh6SSPf6jNJuQEmByyZtj79kuxzilCF8962ViBNciBzk+pQ8qt7HR7lFUIOEN3sUeOOhJe1RuytGk6A==}
-    engines: {node: '>=14.0'}
-    hasBin: true
-    peerDependencies:
-      prisma: ^5.20
-      typescript: ^5.6.2
-
   prisma@5.20.0:
     resolution: {integrity: sha512-6obb3ucKgAnsGS9x9gLOe8qa51XxvJ3vLQtmyf52CTey1Qcez3A6W6ROH5HIz5Q5bW+0VpmZb8WBohieMFGpig==}
     engines: {node: '>=16.13'}
@@ -7850,10 +7833,6 @@ snapshots:
       '@prisma/debug': 5.20.0
       '@prisma/engines-version': 5.20.0-12.06fc58a368dc7be9fbbbe894adf8d445d208c284
       '@prisma/get-platform': 5.20.0
-
-  '@prisma/generator-helper@5.20.0':
-    dependencies:
-      '@prisma/debug': 5.20.0
 
   '@prisma/get-platform@5.20.0':
     dependencies:
@@ -12928,13 +12907,6 @@ snapshots:
   pretty-ms@7.0.1:
     dependencies:
       parse-ms: 2.1.0
-
-  prisma-json-types-generator@3.1.1(prisma@5.20.0)(typescript@5.6.3):
-    dependencies:
-      '@prisma/generator-helper': 5.20.0
-      prisma: 5.20.0
-      tslib: 2.7.0
-      typescript: 5.6.3
 
   prisma@5.20.0:
     dependencies:
