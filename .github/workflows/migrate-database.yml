@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-remix:
-    name: Deploy remix app
+    name: Run a database migration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
