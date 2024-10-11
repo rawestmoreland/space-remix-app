@@ -39,7 +39,7 @@ jobs:
         run: npm install
 
       - name: Prisma generate
-        run: cd packages/database && npx prisma generate && cd ../..
+        run: cd packages/database && npx prisma generate && cd ../express-backend
 
       - name: 🚀 Deploy Trigger.dev
         env:

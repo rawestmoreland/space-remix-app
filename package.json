@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:database": "cd packages/database && npx prisma generate",
+    "build:backend": "cd packages/express-backend && npm run build",
+    "build": "npm run build:database && npm run build:backend"
   },
   "keywords": [],
   "author": "",
