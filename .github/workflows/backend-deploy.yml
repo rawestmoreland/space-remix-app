@@ -13,7 +13,7 @@ on:
 jobs:
   deploy-backend:
     name: Deploy backend
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
@@ -24,16 +24,16 @@ jobs:
 
   deploy-trigger-dot-dev:
     name: Deploy trigger.dev
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [deploy-backend]
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 22.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
+          node-version: '20.x'
 
       - name: Install dependencies
         run: npm install
