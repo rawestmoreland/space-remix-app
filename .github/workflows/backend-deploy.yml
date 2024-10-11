@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - 'Dockerfile.express-backend'
       - '.github/workflows/backend-deploy.yml'
       - 'packages/express-backend/**'
       - 'packages/database/**'
