@@ -6,9 +6,6 @@
 app = 'space-remix-app-vanilla'
 primary_region = 'ord'
 
-[deploy]
-  release_command = "bash ./apps/remix-app/scripts/migrate.sh"
-
 [build]
 
 [http_service]
