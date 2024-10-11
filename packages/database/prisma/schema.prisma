@@ -8,18 +8,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Country {
-  id                        Int    @id @default(autoincrement())
+  id                        Int      @id @default(autoincrement())
   name                      String
-  aplha_2_code              String
+  alpha_2_code              String
   alpha_3_code              String
   nationality_name          String
   nationality_name_composed String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt @default(now())
 }
 
 model MissionType {
@@ -88,6 +94,62 @@ model Program {
   LauncherConfigurations LauncherConfiguration[]
 }
 
+enum ArticleType {
+  ARTICLE
+  BLOG
+}
+
+enum ArticleSource {
+  SPACEFLIGHT_NEWS_API
+}
+
+model Article {
+  id Int @id @default(autoincrement())
+  sourceId Int
+  source ArticleSource @default(SPACEFLIGHT_NEWS_API)
+  url String @unique
+  title String
+  publishedAt DateTime
+  newsSite String?
+  articleType ArticleType? @default(ARTICLE)
+  keywords String[] @default([])
+
+  AIArticleSummary AIArticleSummary?
+  ScrapedArticle ScrapedArticle?
+
+  @@unique([sourceId, source])
+}
+
+model ScrapedArticle {
+  id Int @id @default(autoincrement())
+  content String
+  createdAt DateTime @default(now())
+
+  articleId Int @unique
+  article Article @relation(fields: [articleId], references: [id])
+  aiArticleSummaryId Int? @unique
+  aiArticleSummary AIArticleSummary? @relation(fields: [aiArticleSummaryId], references: [id])
+}
+
+model AIArticleSummary {
+  id Int @id @default(autoincrement())
+  summary String
+  articleId Int @unique
+  article Article @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+
+  ScrapedArticle ScrapedArticle?
+}
+
+model MarsAIAssessment {
+  id Int @id @default(autoincrement())
+  assessmentDate DateTime
+  progressScore Float
+  keyDevelopments String
+  challenges String
+  overallAssessment String
+}
+
 model ProgramType {
   id   Int    @id @default(autoincrement())
   name String
@@ -151,4 +213,13 @@ model AgencyType {
   name String
 
   Agencies Agency[]
+}
+
+model AIBatch {
+  id Int @id @default(autoincrement())
+  batchId String
+  processingStatus String
+  batchCompletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }

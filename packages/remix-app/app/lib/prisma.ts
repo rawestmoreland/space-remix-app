@@ -5,12 +5,12 @@ let prisma: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prisma = createPrisma();
 } else {
-  // @ts-expect-error globalThis
+  // @ts-expect-error
   if (!global.prisma) {
-    // @ts-expect-error globalThis
+    // @ts-expect-error
     global.prisma = createPrisma();
   }
-  // @ts-expect-error globalThis
+  // @ts-expect-error
   prisma = global.prisma;
 }
 

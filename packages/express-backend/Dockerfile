@@ -1,22 +1,33 @@
 FROM node:22.9.0-slim
 
+RUN apt-get update -y && apt-get install -y openssl
+
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
+COPY packages/express-backend/package*.json ./packages/express-backend/
+
+COPY lerna.json ./
+
+COPY packages/express-backend ./packages/express-backend
+COPY packages/database ./packages/database
+
+RUN npm install -g lerna
 
 # Install app dependencies
 RUN npm ci
 
-# Bundle app source
-COPY . .
 
-# Build the TypeScript files
-RUN npm run build
+RUN cd packages/express-backend && npm run build
+
+RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
+
+WORKDIR /app/packages/express-backend
 
 # Expose port 8080
 EXPOSE 8080
 
 # Start the app
-CMD npm run start
+CMD ["npm", "start"]
