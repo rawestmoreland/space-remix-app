@@ -40,9 +40,12 @@ jobs:
 
       - name: Prisma generate
         run: cd packages/database && npx prisma generate && cd ../..
+        env:
+          PRISMA_CLI_BINARY_TARGETS: 'debian-openssl-3.0.x'
 
       - name: 🚀 Deploy Trigger.dev
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          PRISMA_CLI_BINARY_TARGETS: 'debian-openssl-3.0.x'
         run: |
           cd packages/express-backend && npx trigger.dev@latest deploy
