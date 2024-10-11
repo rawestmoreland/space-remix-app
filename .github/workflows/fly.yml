@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --dockerfile Dockerfile.express-backend --config packages/express-backend/fly.toml
+      - run: flyctl deploy --remote-only --dockerfile Dockerfile.express-backend --config packages/express-backend/fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
