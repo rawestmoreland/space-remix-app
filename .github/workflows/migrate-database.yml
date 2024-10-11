@@ -1,4 +1,4 @@
-name: Deploy Remix app
+name: Database migration
 on:
   workflow_dispatch:
   push:
