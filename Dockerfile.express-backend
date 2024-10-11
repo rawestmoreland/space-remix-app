@@ -21,7 +21,7 @@ RUN npm ci --include=dev
 
 RUN cd packages/express-backend && npm run build
 
-# RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
+RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
 
 WORKDIR /app/packages/express-backend
 
