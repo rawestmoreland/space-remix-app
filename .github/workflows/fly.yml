@@ -5,17 +5,36 @@ on:
       - main
 
 jobs:
+  build-remix-image:
+    name: Build remix image
+    runs-on: ubuntu-latest
+    concurrency: build-group
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: registry.fly.io/remix-app:amd
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
   deploy-remix:
     name: Deploy remix app
     runs-on: ubuntu-latest
     concurrency: deploy-group
-    defaults:
-      run:
-        working-directory: packages/remix-app
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - run: flyctl deploy --remote-only --image registry.fly.io/remix-app:amd
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -30,7 +49,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Login to fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl auth login
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - name: Build and push
@@ -39,6 +57,8 @@ jobs:
           context: .
           push: true
           tags: registry.fly.io/launch-list-app-express-backend:amd
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-backend:
     name: Deploy backend
