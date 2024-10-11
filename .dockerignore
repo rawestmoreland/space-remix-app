@@ -1,48 +1,36 @@
-# flyctl launch added from .gitignore
-**/node_modules
+*.log
+.git
+.github
+# editor
+.idea
+# dependencies
+node_modules
+.pnp
+.pnp.js
 
-# flyctl launch added from packages/database/.gitignore
-packages/database/**/node_modules
-# Keep environment variables out of version control
-packages/database/**/.env
+# testing
+coverage
 
-packages/database/**/.trigger
+# next.js
+.next/
+build
 
-packages/database/**/data
+# packages
+build
+dist
+packages/**/dist
 
-# flyctl launch added from packages/express-backend/.gitignore
-# Logs
-packages/express-backend/**/logs
-packages/express-backend/**/*.log
-packages/express-backend/**/npm-debug.log*
-packages/express-backend/**/yarn-debug.log*
-packages/express-backend/**/yarn-error.log*
-packages/express-backend/**/pnpm-debug.log*
-packages/express-backend/**/lerna-debug.log*
+# misc
+.DS_Store
+*.pem
 
-packages/express-backend/**/coverage
-packages/express-backend/**/node_modules
-packages/express-backend/**/dist
-packages/express-backend/**/build
-packages/express-backend/**/dist-ssr
-packages/express-backend/**/*.local
-packages/express-backend/**/.env
+.turbo
+.vercel
+.cache
+.output
+apps/**/public/build
 
-# Editor directories and files
-!packages/express-backend/**/.vscode/extensions.json
-packages/express-backend/**/.idea
-packages/express-backend/**/.DS_Store
-packages/express-backend/**/*.suo
-packages/express-backend/**/*.ntvs*
-packages/express-backend/**/*.njsproj
-packages/express-backend/**/*.sln
-packages/express-backend/**/*.sw?
-packages/express-backend/**/.trigger
+cypress/screenshots
+cypress/videos
 
-# flyctl launch added from packages/remix-app/.gitignore
-packages/remix-app/**/node_modules
-
-packages/remix-app/.cache
-packages/remix-app/build
-packages/remix-app/**/.env
-fly.toml
+packages/**/styles/tailwind.css

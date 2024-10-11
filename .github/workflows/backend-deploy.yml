@@ -1,14 +1,14 @@
 name: Deploy express backend
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Dockerfile.express-backend'
-      - '.github/workflows/backend-deploy.yml'
-      - 'packages/express-backend/**'
-      - 'packages/database/**'
+  # push:
+  # branches:
+  # - main
+  # paths:
+  # - 'Dockerfile.express-backend'
+  # - '.github/workflows/backend-deploy.yml'
+  # - 'packages/express-backend/**'
+  # - 'packages/database/**'
 
 jobs:
   deploy-backend:

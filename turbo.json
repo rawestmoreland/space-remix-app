@@ -1,0 +1,50 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": [".env"],
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "LL_BASE_URL",
+    "SF_NEW_BASE_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL",
+    "SENDFOX_PAT",
+    "SENDFOX_BASE_URL",
+    "PORT",
+    "HOST",
+    "CORS_ORIGIN",
+    "COMMON_RATE_LIMIT_WINDOW_MS",
+    "COMMON_RATE_LIMIT_MAX_REQUESTS",
+    "ANTHROPIC_API_KEY"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "public/build/**",
+        "build/**",
+        "app/styles/tailwind.css",
+        ".cache"
+      ]
+    },
+    "@repo/remix-app#start": {
+      "dependsOn": ["^build"],
+      "outputs": ["public/build/**"]
+    },
+    "start": {
+      "dependsOn": ["^build"],
+      "outputs": ["public/build/**"]
+    },
+    "generate": {
+      "dependsOn": ["^generate"]
+    },
+    "dev": {
+      "dependsOn": ["^generate"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

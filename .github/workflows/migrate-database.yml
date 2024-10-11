@@ -1,11 +1,11 @@
 name: Database migration
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'packages/database/prisma/schema.prisma'
+  # push:
+  # branches:
+  # - main
+  # paths:
+  # - 'packages/database/prisma/schema.prisma'
 
 jobs:
   deploy-remix:
