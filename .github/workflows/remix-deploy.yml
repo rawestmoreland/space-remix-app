@@ -1,5 +1,6 @@
 name: Deploy Remix app
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
