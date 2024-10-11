@@ -4,6 +4,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/backend-deploy.yml'
       - 'packages/express-backend/**'
       - 'packages/database/**'
 

@@ -4,6 +4,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/remix-deploy.yml'
       - 'packages/remix-app/**'
       - 'packages/database/**'
 
