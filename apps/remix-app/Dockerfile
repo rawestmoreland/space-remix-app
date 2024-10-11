@@ -65,6 +65,7 @@ WORKDIR /app/apps/$APP_DIRNAME
 # Install production dependencies
 RUN pnpm install --prod
 
+EXPOSE 3000
 
 # release_command = "pnpx prisma migrate deploy --schema packages/database/prisma/schema.prisma"
 CMD ["node", "./build/server/index.js"]
