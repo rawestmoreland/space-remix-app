@@ -32,7 +32,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Login to fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl auth login --token ${{ secrets.FLY_API_TOKEN }}
+      - run: flyctl auth login
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - name: Build and push
