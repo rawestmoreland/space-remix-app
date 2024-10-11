@@ -12,18 +12,16 @@ COPY package*.json ./
 COPY packages/express-backend/package*.json ./packages/express-backend/
 
 COPY lerna.json ./
+COPY packages/express-backend ./packages/express-backend
+COPY packages/database ./packages/database
 
 RUN npm install -g lerna
 
 # Install app dependencies
-RUN npm ci --include=dev
-
-# COPY packages/express-backend ./packages/express-backend
-# COPY packages/database ./packages/database
-
-RUN cd packages/express-backend && npm run build
+RUN npm install --include=dev
 
 RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
+RUN cd packages/express-backend && npm run build
 
 WORKDIR /app/packages/express-backend
 

@@ -31,7 +31,7 @@ RUN npm install -g lerna
 
 RUN npm install --include=dev
 
-RUN cd packages/database && npx prisma generate
+RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
 
 RUN cd packages/remix-app && npm run build
 
