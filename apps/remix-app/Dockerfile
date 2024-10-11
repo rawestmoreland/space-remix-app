@@ -50,11 +50,21 @@ ARG APP_DIRNAME
 
 ENV NODE_ENV production
 
+WORKDIR /app
+
+
 
 COPY --from=pruner /app/out/full/ .
 COPY --from=production-deps /app .
 COPY --from=builder /app/apps/$APP_DIRNAME/build ./apps/$APP_DIRNAME/build
 COPY --from=builder /app/apps/$APP_DIRNAME/public ./apps/$APP_DIRNAME/public
 
+# Set the working directory to the app directory
+WORKDIR /app/apps/$APP_DIRNAME
+
+# Install production dependencies
+RUN pnpm install --prod
+
+
 # release_command = "pnpx prisma migrate deploy --schema packages/database/prisma/schema.prisma"
-CMD ["pnpm", "run", "start"]
+CMD ["node", "./build/server/index.js"]
