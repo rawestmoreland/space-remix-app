@@ -7,7 +7,7 @@
     "remix": "remix vite:build",
     "dev": "pnpm with-env remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "cross-env NODE_ENV=production remix-serve ./build/server/index.js",
+    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "with-env": "dotenv -e ../../.env --"
   },
