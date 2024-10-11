@@ -27,9 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-backend]
     concurrency: deploy-group
-    defaults:
-      run:
-        working-directory: packages/express-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -38,11 +35,11 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: Generate prisma
-        run: cd packages/database && npx prisma generate
-
       - name: Install dependencies
         run: npm install
+
+      - name: Prisma generate
+        run: cd packages/database && npx prisma generate && cd ../..
 
       - name: 🚀 Deploy Trigger.dev
         env:
