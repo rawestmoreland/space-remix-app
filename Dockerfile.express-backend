@@ -17,14 +17,16 @@ COPY packages/database ./packages/database
 RUN npm install -g lerna
 
 # Install app dependencies
-RUN npm ci
-
+RUN npm ci --include=dev
 
 RUN cd packages/express-backend && npm run build
 
 RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
 
 WORKDIR /app/packages/express-backend
+
+# Remove development dependencies
+RUN npm prune --omit=dev
 
 # Expose port 8080
 EXPOSE 8080
