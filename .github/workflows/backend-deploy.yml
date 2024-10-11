@@ -38,6 +38,9 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Generate prisma
+        run: cd packages/database && npx prisma generate
+
       - name: Install dependencies
         run: npm install
 
