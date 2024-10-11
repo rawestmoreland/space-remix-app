@@ -7,7 +7,7 @@ on:
     paths:
       - '.github/workflows/remix-deploy.yml'
       - 'packages/remix-app/**'
-      - 'packages/database/**'
+      # - 'packages/database/**'
 
 jobs:
   deploy-remix:
