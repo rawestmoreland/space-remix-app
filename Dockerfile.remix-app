@@ -29,9 +29,9 @@ COPY packages/remix-app /app/packages/remix-app
 
 RUN npm install -g lerna
 
-RUN npm install --include=dev
+RUN npm install
 
-RUN cd packages/database && npx prisma generate && npx prisma migrate deploy
+RUN cd packages/database && npx prisma generate
 
 RUN cd packages/remix-app && npm run build
 
