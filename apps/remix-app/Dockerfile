@@ -30,6 +30,7 @@ WORKDIR /app
 ENV NODE_ENV production
 RUN pnpm install --prod
 COPY --from=pruner /app/out/full/packages/database/prisma/schema.prisma /app/packages/database/prisma/schema.prisma
+RUN pnpm add -D prisma-json-types-generator
 RUN pnpm dlx prisma generate --schema /app/packages/database/prisma/schema.prisma
 
 FROM base AS builder
@@ -56,6 +57,7 @@ COPY --from=production-deps /app .
 COPY --from=builder /app/apps/$APP_DIRNAME/server.mjs ./apps/$APP_DIRNAME/server.mjs
 COPY --from=builder /app/apps/$APP_DIRNAME/build ./apps/$APP_DIRNAME/build
 COPY --from=builder /app/apps/$APP_DIRNAME/public ./apps/$APP_DIRNAME/public
+COPY --from=production-deps /app/node_modules/.prisma ./node_modules/.prisma
 
 # release_command = "pnpx prisma migrate deploy --schema packages/database/prisma/schema.prisma"
 CMD ["pnpm", "run", "start-remix-production"]
