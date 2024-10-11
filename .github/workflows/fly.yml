@@ -22,6 +22,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: packages/remix-app/Dockerfile
           push: true
           tags: registry.fly.io/remix-app:amd
         env:
@@ -29,6 +30,7 @@ jobs:
 
   deploy-remix:
     name: Deploy remix app
+    needs: build-remix-image
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
@@ -55,6 +57,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: packages/express-backend/Dockerfile
           push: true
           tags: registry.fly.io/launch-list-app-express-backend:amd
         env:
