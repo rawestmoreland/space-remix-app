@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'packages/remix-app/**'
+      - 'packages/express-backend/**'
 
 jobs:
   deploy-remix:
