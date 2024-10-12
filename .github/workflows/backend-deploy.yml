@@ -297,21 +297,16 @@ jobs:
       - name: 📥 Install dependencies
         run: pnpm install
 
-      - name: 🗃️ Generate Prisma Client
-        run: cd packages/database && npx prisma generate && cd ../..
+      - name: 🏗️ Build
+        run: |
+          cd apps/backend
+          turbo build
+          cd ../../
 
       - name: 🔄 Run Prisma migrations
         run: cd packages/database && npx prisma migrate deploy && cd ../..
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - name: 📦 Prepare for trigger.dev deployment
-        run: |
-          cd apps/backend
-          npm pkg set scripts.postinstall="prisma generate"
-          npm pkg set prisma.schema="../../packages/database/prisma/schema.prisma"
-          pnpm install
-          cd ../..
 
       - name: 🚀 Deploy to trigger.dev
         env:
