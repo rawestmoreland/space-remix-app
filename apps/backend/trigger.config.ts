@@ -1,11 +1,12 @@
-import { defineConfig } from "@trigger.dev/sdk/v3";
+import { defineConfig } from '@trigger.dev/sdk/v3';
+import { prismaExtension } from '@trigger.dev/build/extensions/prisma';
 
 export default defineConfig({
-  project: "proj_mctenvjkyfumjmznkram",
-  runtime: "node",
-  logLevel: "log",
+  project: 'proj_mctenvjkyfumjmznkram',
+  runtime: 'node',
+  logLevel: 'log',
   // Set the maxDuration to 300 seconds for all tasks. See https://trigger.dev/docs/runs/max-duration
-  // maxDuration: 300, 
+  // maxDuration: 300,
   retries: {
     enabledInDev: true,
     default: {
@@ -16,5 +17,12 @@ export default defineConfig({
       randomize: true,
     },
   },
-  dirs: ["./src/trigger"],
+  build: {
+    extensions: [
+      prismaExtension({
+        schema: '../../packages/database/prisma/schema.prisma',
+      }),
+    ],
+  },
+  dirs: ['./src/trigger'],
 });
