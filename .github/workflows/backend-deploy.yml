@@ -294,6 +294,9 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: 💨 Install turbo
+        run: pnpm add -g turbo
+
       - name: 📥 Install dependencies
         run: pnpm install
 
