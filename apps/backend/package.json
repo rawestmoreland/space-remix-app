@@ -8,21 +8,23 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
+    "dev": "pnpm with-env tsx watch --clear-screen=false src/index.ts | pino-pretty",
     "build": "tsup",
-    "start": "node dist/index.js",
+    "start": "node -r dotenv/config dist/index.js",
     "clean": "rimraf dist coverage",
     "lint": "biome check src/",
     "lint:fix": "biome check src/ --fix",
     "format": "biome format src/",
     "test": "vitest run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.29.0",
     "@asteasolutions/zod-to-openapi": "^7.0.0",
     "@prisma/client": "^5.20.0",
     "@trigger.dev/sdk": "^3.0.12",
+    "@repo/database": "workspace:*",
     "axios": "^1.7.7",
     "body-parser": "^1.20.3",
     "cheerio": "^1.0.0",

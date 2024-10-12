@@ -36,7 +36,7 @@
     },
     "start": {
       "dependsOn": ["^build"],
-      "outputs": ["public/build/**"]
+      "outputs": ["public/build/**", "dist/**", "build/**"]
     },
     "generate": {
       "dependsOn": ["^generate"]

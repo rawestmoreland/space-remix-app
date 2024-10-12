@@ -32,6 +32,9 @@ importers:
       '@prisma/client':
         specifier: ^5.20.0
         version: 5.20.0(prisma@5.20.0)
+      '@repo/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@trigger.dev/sdk':
         specifier: ^3.0.12
         version: 3.0.12

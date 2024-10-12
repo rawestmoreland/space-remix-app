@@ -60,9 +60,6 @@ COPY --from=builder /app/apps/$APP_DIRNAME/public ./apps/$APP_DIRNAME/public
 # Set the working directory to the app directory
 WORKDIR /app/apps/$APP_DIRNAME
 
-# Install production dependencies
-RUN pnpm install --prod
-
 EXPOSE 3000
 
 # release_command = "pnpx prisma migrate deploy --schema packages/database/prisma/schema.prisma"
