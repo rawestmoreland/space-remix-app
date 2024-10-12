@@ -310,6 +310,7 @@ jobs:
           cd apps/backend
           npm pkg set scripts.postinstall="prisma generate"
           npm pkg set prisma.schema="../packages/database/prisma/schema.prisma"
+          pnpm install
           cd ../..
 
       - name: 🚀 Deploy to trigger.dev
