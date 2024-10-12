@@ -315,7 +315,8 @@ jobs:
         run: |
           cd apps/backend
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-          rsync -av --delete ../../node_modules/.pnpm/@prisma+client@5.20.0_prisma@5.20.0/node_modules/@prisma/client/ node_modules/@prisma/client/
+          mkdir -p node_modules/.pnpm/@prisma+client@5.20.0_prisma@5.20.0/node_modules/.prisma/client
+          rsync -av --delete ../../node_modules/.pnpm/@prisma+client@5.20.0_prisma@5.20.0/.prisma/client/ node_modules/.pnpm/@prisma+client@5.20.0_prisma@5.20.0/node_modules/.prisma/client/
           cd ../..
 
       - name: 🚀 Deploy to trigger.dev
