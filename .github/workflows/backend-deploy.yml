@@ -305,6 +305,13 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: 📦 Prepare for trigger.dev deployment
+        run: |
+          cd apps/backend
+          npm pkg set scripts.postinstall="prisma generate"
+          npm pkg set prisma.schema="../packages/database/prisma/schema.prisma"
+          cd ../..
+
       - name: 🚀 Deploy to trigger.dev
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
