@@ -16,7 +16,6 @@
     "lint:fix": "biome check src/ --fix",
     "format": "biome format src/",
     "test": "vitest run",
-    "prepare": "husky",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {

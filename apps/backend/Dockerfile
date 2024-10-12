@@ -26,7 +26,7 @@ RUN pnpm install
 FROM base as production-deps
 WORKDIR /app
 ENV NODE_ENV production
-RUN pnpm install --prod
+RUN pnpm install
 COPY --from=pruner /app/out/full/packages/database/prisma/schema.prisma /app/packages/database/prisma/schema.prisma
 RUN pnpm dlx prisma generate --schema /app/packages/database/prisma/schema.prisma
 
