@@ -137,7 +137,7 @@ model ScrapedArticle {
   createdAt DateTime @default(now())
 
   articleId Int @unique
-  article Article @relation(fields: [articleId], references: [id])
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   aiArticleSummaryId Int? @unique
   aiArticleSummary AIArticleSummary? @relation(fields: [aiArticleSummaryId], references: [id])
 }

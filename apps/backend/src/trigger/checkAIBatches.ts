@@ -68,6 +68,14 @@ export const checkAIBatches = schedules.task({
                   );
                   if (!articleSummary) {
                     logger.error(`Empty summary: ${result.custom_id}`);
+
+                    // If the summary is empty, delete the article from the DB
+                    await prisma.article.delete({
+                      where: {
+                        id: parseInt(result.custom_id),
+                      },
+                    });
+
                     continue;
                   }
                   await prisma.aIArticleSummary.create({
