@@ -37,6 +37,8 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
                           - Cosmic Discoveries
                           - Space Technology Innovations
                           - Mars Exploration Updates
+                          - Moon Exploration Updates
+                          - Starship Updates
                           - Space Economy & Ventures
                           - Human Spaceflight Milestones
                           - Earth from Above
