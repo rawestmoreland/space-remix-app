@@ -29,7 +29,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
   queryURL.searchParams.append('search', 'spacex');
-  queryURL.searchParams.append('ordering', '-net');
+  queryURL.searchParams.append('ordering', 'net');
 
   const { data, error } = await getLaunches(queryURL.toString());
   if (error) {
