@@ -8,7 +8,7 @@ export function extractArticleSummary(xmlString: string): string | null {
   return null;
 }
 
-export function extractCategory(xmlString: string): string | null {
+export function extractCategory(xmlString: string): string {
   const regex = /<category>(.*?)<\/category>/s;
   const match = xmlString.match(regex);
 

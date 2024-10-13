@@ -24,74 +24,72 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
               content: [
                 {
                   type: 'text',
-                  text: `You will be analyzing an article about space exploration to summarize information relevant to civilization's progress with space travel. Your task is to extract and summarize key points related to the following areas:
+                  text: `You will be analyzing an article about space exploration to summarize information relevant to civilization's progress toward advancing space exploration. Your task is to extract and summarize key points related to the following areas:
 
-                    1. Technological advancements
-                    2. Funding changes
-                    3. Public support shifts
-                    4. International cooperation developments
-                    5. Scientific discoveries
+                          1. Technological advancements
+                          2. Funding changes
+                          3. Public support shifts
+                          4. International cooperation developments
+                          5. Scientific discoveries
 
-                    After you read the article and extracted the key points, I would like you to categorize the article into exactly one of the following categories.
+                          After you read the article and extracted the key points, I would like you to categorize the article into exactly one of the following categories.
 
-                    - Cosmic Discoveries
-                    - Space Technology Innovations
-                    - Mars Exploration Updates
-                    - Moon Mission Updates
-                    - Space Economy & Ventures
-                    - Human Spaceflight Milestones
-                    - Starship Milestones
-                    - Earth from Above
-                    - Sci-Fi Becoming Reality
-                    - Space Policy & Governance
-                    - Citizen Space Science
-                    - Deep Space Mysteries
-                    - Space Sustainability
-                    - Upcoming Space Events
+                          - Cosmic Discoveries
+                          - Space Technology Innovations
+                          - Mars Exploration Updates
+                          - Space Economy & Ventures
+                          - Human Spaceflight Milestones
+                          - Earth from Above
+                          - Sci-Fi Becoming Reality
+                          - Space Policy & Governance
+                          - Citizen Space Science
+                          - Deep Space Mysteries
+                          - Space Sustainability
+                          - Upcoming Space Events
 
-                    Choose the category that best fits the main focus of the article. If an article touches on multiple categories, choose the most prominent one. Place the category that you choose in the <category> tags.
+                          Choose the category that best fits the main focus of the article. If an article touches on multiple categories, choose the most prominent one. Place the category that you choose in the <category> tags.
 
-                    Here is the article text to analyze:
+                          Here is the article text to analyze:
 
-                    <article>
-                    ${article.content}
-                    </article>
+                          <article>
+                          ${article.content}
+                          </article>
 
-                    Please read and analyze the article carefully. For each of the five key areas listed above, summarize any relevant information found in the article. If no information is found for a particular area, state that explicitly.
+                          Please read and analyze the article carefully. For each of the five key areas listed above, summarize any relevant information found in the article. If no information is found for a particular area, state that explicitly.
 
-                    After summarizing the individual areas, provide a brief overall summary of the article's relevance to progress toward space exploration.
+                          After summarizing the individual areas, provide a brief overall summary of the article's relevance to progress toward space exploration. Avoid using phrasing like "this article summarizes" or "this is a summary" or "this article". We don't need to be told it's a summary.
 
-                    Present your findings in the following format:
+                          Present your findings in the following format:
 
-                    <category>
-                    Select one, and only one category from the list provided based on the content of the article.
-                    </category>
+                          <category>
+                          Select one, and only one category from the list provided based on the content of the article.
+                          </category>
 
-                    <technological_advancements>
-                    Summarize any relevant technological advancements mentioned in the article.
-                    </technological_advancements>
+                          <technological_advancements>
+                          Summarize any relevant technological advancements mentioned in the article.
+                          </technological_advancements>
 
-                    <funding_changes>
-                    Summarize any relevant funding changes mentioned in the article.
-                    </funding_changes>
+                          <funding_changes>
+                          Summarize any relevant funding changes mentioned in the article.
+                          </funding_changes>
 
-                    <public_support>
-                    Summarize any relevant shifts in public support mentioned in the article.
-                    </public_support>
+                          <public_support>
+                          Summarize any relevant shifts in public support mentioned in the article.
+                          </public_support>
 
-                    <international_cooperation>
-                    Summarize any relevant developments in international cooperation mentioned in the article.
-                    </international_cooperation>
+                          <international_cooperation>
+                          Summarize any relevant developments in international cooperation mentioned in the article.
+                          </international_cooperation>
 
-                    <scientific_discoveries>
-                    Summarize any relevant scientific discoveries mentioned in the article.
-                    </scientific_discoveries>
+                          <scientific_discoveries>
+                          Summarize any relevant scientific discoveries mentioned in the article.
+                          </scientific_discoveries>
 
-                    <overall_summary>
-                    Provide a brief overall summary of the article's relevance to progress toward space, based on the information found in the above categories.
-                    </overall_summary>
+                          <overall_summary>
+                          Provide a brief overall summary of the article's relevance to progress toward space exploration, based on the information found in the above categories. Avoid language like, "this article summarize", "this article is about", "this is a summary", etc.
+                          </overall_summary>
 
-                    Ensure that your summaries are concise and focused on information directly related to space exploration efforts. If the article contains no relevant information for a particular category or for space exploration in general, clearly state this in your response.`,
+                          Ensure that your summaries are concise and focused on information directly related to space exploration efforts. If the article contains no relevant information for a particular category or for space exploration in general, clearly state this in your response.`,
                 },
               ],
             },

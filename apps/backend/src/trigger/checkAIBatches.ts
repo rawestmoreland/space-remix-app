@@ -1,7 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { createSummaryBatch, IRawArticle } from '@/common/utils/aiSummarizer';
+import { IRawArticle } from '@/common/utils/aiSummarizer';
 import { prisma } from '@/prisma';
 import { logger, schedules } from '@trigger.dev/sdk/v3';
+import { extractArticleSummary, extractCategory } from '@/common/utils/regex';
 
 const anthropic = new Anthropic();
 
@@ -39,6 +40,7 @@ export const checkAIBatches = schedules.task({
             id: batch.id,
           },
           data: {
+            batchCompletedAt: batchStatus.ended_at,
             processingStatus: batchStatus.processing_status,
           },
         });
@@ -50,6 +52,36 @@ export const checkAIBatches = schedules.task({
             case 'succeeded':
               logger.log(`Batch ${result.custom_id} succeeded`);
               logger.log(`Result: ${JSON.stringify(result, null, 2)}`);
+              let articleSummary: string | null = null;
+              // Add the summary to the DB and associate the article with it
+              if (result.result.message.content?.[0].type !== 'text') {
+                continue;
+              } else {
+                if (!result.result.message.content[0].text) {
+                  continue;
+                } else {
+                  articleSummary = extractArticleSummary(
+                    result.result.message.content[0].text
+                  );
+                  const articleCategory = extractCategory(
+                    result.result.message.content[0].text
+                  );
+                  if (!articleSummary) {
+                    continue;
+                  }
+                  await prisma.aIArticleSummary.create({
+                    data: {
+                      category: articleCategory,
+                      summary: articleSummary,
+                      article: {
+                        connect: {
+                          id: parseInt(result.custom_id),
+                        },
+                      },
+                    },
+                  });
+                }
+              }
               break;
             case 'errored':
               if (result.result.error?.type === ('invalid_request' as any)) {
