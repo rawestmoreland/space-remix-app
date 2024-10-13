@@ -50,14 +50,14 @@ export const checkAIBatches = schedules.task({
         )) {
           switch (result.result.type) {
             case 'succeeded':
-              logger.log(`Batch ${result.custom_id} succeeded`);
-              logger.log(`Result: ${JSON.stringify(result, null, 2)}`);
               let articleSummary: string | null = null;
               // Add the summary to the DB and associate the article with it
               if (result.result.message.content?.[0].type !== 'text') {
+                logger.error(`Invalid content type: ${result.custom_id}`);
                 continue;
               } else {
                 if (!result.result.message.content[0].text) {
+                  logger.error(`Empty content: ${result.custom_id}`);
                   continue;
                 } else {
                   articleSummary = extractArticleSummary(
@@ -67,6 +67,7 @@ export const checkAIBatches = schedules.task({
                     result.result.message.content[0].text
                   );
                   if (!articleSummary) {
+                    logger.error(`Empty summary: ${result.custom_id}`);
                     continue;
                   }
                   await prisma.aIArticleSummary.create({
