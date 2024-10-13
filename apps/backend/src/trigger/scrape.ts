@@ -6,8 +6,8 @@ import { logger, schedules } from '@trigger.dev/sdk/v3';
 
 export const scrapeNewArticles = schedules.task({
   id: 'scrape-new-articles',
-  // every 30 minutes
-  cron: '*/30 * * * *',
+  // every top of the hour
+  cron: '0 * * * *',
   maxDuration: 300, // 5 minutes
   run: async (payload, { ctx }) => {
     let articleCount = 0;

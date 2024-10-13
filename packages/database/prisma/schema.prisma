@@ -118,6 +118,19 @@ model Article {
   @@unique([sourceId, source])
 }
 
+enum NewsletterPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model NewsletterPost {
+  id Int @id @default(autoincrement())
+  title String
+  content String // HTML content
+  status NewsletterPostStatus @default(DRAFT)
+  createdAt DateTime @default(now())
+}
+
 model ScrapedArticle {
   id Int @id @default(autoincrement())
   content String
