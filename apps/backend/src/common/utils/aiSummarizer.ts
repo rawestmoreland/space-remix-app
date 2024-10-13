@@ -24,7 +24,74 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
               content: [
                 {
                   type: 'text',
-                  text: `You will be analyzing an article about space exploration to summarize information relevant to civilization's progress toward getting to Mars. Your task is to extract and summarize key points related to the following areas:\n\n1. Technological advancements\n2. Funding changes\n3. Public support shifts\n4. International cooperation developments\n5. Scientific discoveries\n\nHere is the article text to analyze:\n\n<article>\n${article.content}\n</article>\n\nPlease read and analyze the article carefully. For each of the five key areas listed above, summarize any relevant information found in the article. If no information is found for a particular area, state that explicitly.\n\nAfter summarizing the individual areas, provide a brief overall summary of the article's relevance to progress toward Mars exploration.\n\nPresent your findings in the following format:\n\n<technological_advancements>\nSummarize any relevant technological advancements mentioned in the article.\n</technological_advancements>\n\n<funding_changes>\nSummarize any relevant funding changes mentioned in the article.\n</funding_changes>\n\n<public_support>\nSummarize any relevant shifts in public support mentioned in the article.\n</public_support>\n\n<international_cooperation>\nSummarize any relevant developments in international cooperation mentioned in the article.\n</international_cooperation>\n\n<scientific_discoveries>\nSummarize any relevant scientific discoveries mentioned in the article.\n</scientific_discoveries>\n\n<overall_summary>\nProvide a brief overall summary of the article's relevance to progress toward Mars exploration, based on the information found in the above categories.\n</overall_summary>\n\nEnsure that your summaries are concise and focused on information directly related to Mars exploration efforts. If the article contains no relevant information for a particular category or for Mars exploration in general, clearly state this in your response.`,
+                  text: `You will be analyzing an article about space exploration to summarize information relevant to civilization's progress with space travel. Your task is to extract and summarize key points related to the following areas:
+
+                    1. Technological advancements
+                    2. Funding changes
+                    3. Public support shifts
+                    4. International cooperation developments
+                    5. Scientific discoveries
+
+                    After you read the article and extracted the key points, I would like you to categorize the article into exactly one of the following categories.
+
+                    - Cosmic Discoveries
+                    - Space Technology Innovations
+                    - Mars Exploration Updates
+                    - Moon Mission Updates
+                    - Space Economy & Ventures
+                    - Human Spaceflight Milestones
+                    - Starship Milestones
+                    - Earth from Above
+                    - Sci-Fi Becoming Reality
+                    - Space Policy & Governance
+                    - Citizen Space Science
+                    - Deep Space Mysteries
+                    - Space Sustainability
+                    - Upcoming Space Events
+
+                    Choose the category that best fits the main focus of the article. If an article touches on multiple categories, choose the most prominent one. Place the category that you choose in the <category> tags.
+
+                    Here is the article text to analyze:
+
+                    <article>
+                    ${article.content}
+                    </article>
+
+                    Please read and analyze the article carefully. For each of the five key areas listed above, summarize any relevant information found in the article. If no information is found for a particular area, state that explicitly.
+
+                    After summarizing the individual areas, provide a brief overall summary of the article's relevance to progress toward space exploration.
+
+                    Present your findings in the following format:
+
+                    <category>
+                    Select one, and only one category from the list provided based on the content of the article.
+                    </category>
+
+                    <technological_advancements>
+                    Summarize any relevant technological advancements mentioned in the article.
+                    </technological_advancements>
+
+                    <funding_changes>
+                    Summarize any relevant funding changes mentioned in the article.
+                    </funding_changes>
+
+                    <public_support>
+                    Summarize any relevant shifts in public support mentioned in the article.
+                    </public_support>
+
+                    <international_cooperation>
+                    Summarize any relevant developments in international cooperation mentioned in the article.
+                    </international_cooperation>
+
+                    <scientific_discoveries>
+                    Summarize any relevant scientific discoveries mentioned in the article.
+                    </scientific_discoveries>
+
+                    <overall_summary>
+                    Provide a brief overall summary of the article's relevance to progress toward space, based on the information found in the above categories.
+                    </overall_summary>
+
+                    Ensure that your summaries are concise and focused on information directly related to space exploration efforts. If the article contains no relevant information for a particular category or for space exploration in general, clearly state this in your response.`,
                 },
               ],
             },

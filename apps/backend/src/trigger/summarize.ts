@@ -5,7 +5,7 @@ import { logger, schedules } from '@trigger.dev/sdk/v3';
 export const sendBatchForSummary = schedules.task({
   id: 'send-batch-for-summary',
   // every 1 hour,
-  // cron: '0 */1 * * *',
+  cron: '0 */1 * * *',
   maxDuration: 600, // 10 minutes
   run: async (payload, { ctx }) => {
     // Get all articles with scraped content that have not been summarized

@@ -7,64 +7,62 @@ import { logger, schedules } from '@trigger.dev/sdk/v3';
 export const scrapeNewArticles = schedules.task({
   id: 'scrape-new-articles',
   // every 30 minutes
-  cron: '*/1 * * * *',
+  cron: '*/30 * * * *',
   maxDuration: 300, // 5 minutes
   run: async (payload, { ctx }) => {
     let articleCount = 0;
     const latestArticleDate = await getLatestArticleDate();
 
-    return logger.log(`Latest article date: ${latestArticleDate}`);
+    const latestArticles = await fetchArticles({
+      afterDate: latestArticleDate,
+    });
 
-    // const latestArticles = await fetchArticles({
-    //   afterDate: latestArticleDate,
-    // });
+    if (!latestArticles?.results) {
+      return logger.log("Couldn't find any new articles");
+    }
 
-    // if (!latestArticles?.results) {
-    //   return logger.log("Couldn't find any new articles");
-    // }
+    for (const article of latestArticles.results) {
+      if (article.url) {
+        const existingArticle = await prisma.article.findFirst({
+          where: {
+            url: article.url,
+          },
+        });
 
-    // for (const article of latestArticles.results) {
-    //   if (article.url) {
-    //     const existingArticle = await prisma.article.findFirst({
-    //       where: {
-    //         url: article.url,
-    //       },
-    //     });
+        // If the article already exists, skip it
+        if (existingArticle) {
+          continue;
+        }
 
-    //     // If the article already exists, skip it
-    //     if (existingArticle) {
-    //       continue;
-    //     }
+        const data = await articleScraper(article.url);
 
-    //     const data = await articleScraper(article.url);
+        // If the article could not be scraped, skip it
+        if (!data || data.success === false) {
+          continue;
+        }
+        // Create the article in the database
+        await prisma.article.create({
+          data: {
+            title: article.title,
+            url: article.url,
+            publishedAt: new Date(article.published_at),
+            source: ArticleSource.SPACEFLIGHT_NEWS_API,
+            articleType: ArticleType.ARTICLE,
+            newsSite: article.news_site,
+            keywords: ['mars'],
+            sourceId: article.id,
+            ScrapedArticle: {
+              create: {
+                content: data.message,
+              },
+            },
+          },
+        });
 
-    //     // If the article could not be scraped, skip it
-    //     if (!data || data.success === false) {
-    //       continue;
-    //     }
-    //     // Create the article in the database
-    //     await prisma.article.create({
-    //       data: {
-    //         title: article.title,
-    //         url: article.url,
-    //         publishedAt: new Date(article.published_at),
-    //         source: ArticleSource.SPACEFLIGHT_NEWS_API,
-    //         articleType: ArticleType.ARTICLE,
-    //         newsSite: article.news_site,
-    //         keywords: ['mars'],
-    //         sourceId: article.id,
-    //         ScrapedArticle: {
-    //           create: {
-    //             content: data.message,
-    //           },
-    //         },
-    //       },
-    //     });
+        articleCount++;
+      }
+    }
 
-    //     articleCount++;
-    //   }
-    // }
-
-    // logger.log(`${articleCount} articles scraped`);
+    logger.log(`${articleCount} articles scraped`);
   },
 });

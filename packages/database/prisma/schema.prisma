@@ -107,7 +107,7 @@ model Article {
   source ArticleSource @default(SPACEFLIGHT_NEWS_API)
   url String @unique
   title String
-  publishedAt DateTime
+  publishedAt DateTime @default(now())
   newsSite String?
   articleType ArticleType? @default(ARTICLE)
   keywords String[] @default([])
@@ -135,6 +135,7 @@ model AIArticleSummary {
   articleId Int @unique
   article Article @relation(fields: [articleId], references: [id])
   createdAt DateTime @default(now())
+  category String
 
   ScrapedArticle ScrapedArticle?
 }
@@ -213,10 +214,16 @@ model AgencyType {
   Agencies Agency[]
 }
 
+enum BatchStatus {
+  in_progress
+  ended
+  canceling
+}
+
 model AIBatch {
   id Int @id @default(autoincrement())
   batchId String
-  processingStatus String
+  processingStatus BatchStatus @default(in_progress)
   batchCompletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
