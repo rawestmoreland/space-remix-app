@@ -49,7 +49,6 @@ export const scrapeNewArticles = schedules.task({
             source: ArticleSource.SPACEFLIGHT_NEWS_API,
             articleType: ArticleType.ARTICLE,
             newsSite: article.news_site,
-            keywords: ['mars'],
             sourceId: article.id,
             ScrapedArticle: {
               create: {
