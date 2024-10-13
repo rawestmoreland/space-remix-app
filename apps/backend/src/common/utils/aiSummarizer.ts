@@ -57,7 +57,7 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
 
                           Please read and analyze the article carefully. For each of the five key areas listed above, summarize any relevant information found in the article. If no information is found for a particular area, state that explicitly.
 
-                          After summarizing the individual areas, provide a brief overall summary of the article's relevance to progress toward space exploration. Avoid using phrasing like "this article summarizes" or "this is a summary" or "this article". We don't need to be told it's a summary.
+                          After summarizing the individual areas, provide a brief overall summary of the article. Avoid using phrasing like "this article summarizes..." or "this is a summary..." or "this article...". We don't need to be told it's a summary.
 
                           Present your findings in the following format:
 
@@ -86,7 +86,7 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
                           </scientific_discoveries>
 
                           <overall_summary>
-                          Provide a brief overall summary of the article's relevance to progress toward space exploration, based on the information found in the above categories. Avoid language like, "this article summarize", "this article is about", "this is a summary", etc.
+                          Provide a brief overall summary of the article. Avoid language like, "this article summarize", "this article is about", "this is a summary", etc.
                           </overall_summary>
 
                           Ensure that your summaries are concise and focused on information directly related to space exploration efforts. If the article contains no relevant information for a particular category or for space exploration in general, clearly state this in your response.`,
