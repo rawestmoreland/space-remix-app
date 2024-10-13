@@ -146,7 +146,7 @@ model AIArticleSummary {
   id Int @id @default(autoincrement())
   summary String
   articleId Int @unique
-  article Article @relation(fields: [articleId], references: [id])
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   category String
 

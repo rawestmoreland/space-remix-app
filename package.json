@@ -10,7 +10,7 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:migrate:deploy": "turbo db:migrate:deploy",
-    "db:migrate:dev": "npm run --filter=apps/backend db:migrate:dev",
+    "db:migrate:dev": "pnpm run --filter=packages/database db:migrate:dev",
     "db:push": "turbo run db:push",
     "generate": "turbo generate"
   },
