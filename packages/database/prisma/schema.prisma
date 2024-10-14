@@ -126,9 +126,14 @@ enum NewsletterPostStatus {
 model NewsletterPost {
   id Int @id @default(autoincrement())
   title String
+  slug String @unique
   content String // HTML content
   status NewsletterPostStatus @default(DRAFT)
   createdAt DateTime @default(now())
+  pubDate DateTime?
+  description String?
+  excerpt String?
+  author String @default("Richard W.")
 }
 
 model ScrapedArticle {

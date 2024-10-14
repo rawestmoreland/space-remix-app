@@ -7,6 +7,7 @@ export type RssPost = {
   pubDate: string;
   guid?: string;
   author?: string;
+  slug: string;
 };
 
 /**
@@ -44,7 +45,7 @@ export function generateRss({
             <title><![CDATA[${post.title}]]></title>
             <description><![CDATA[${post.description}]]></description>
             <pubDate>${post.pubDate}</pubDate>
-            <link>${post.link}</link>
+            <link>https://launchlist.space/post/${post.slug}</link>
             <guid isPermaLink="false">${post.link}</guid>
           </item>`
     )
@@ -60,24 +61,26 @@ export function generateRss({
 export const loader: LoaderFunction = async () => {
   const posts = [
     {
-      title: 'Hello, world!',
-      slug: 'hello-world',
-      pubDate: '2022-01-01',
-      description: 'This is my first post.',
-      excerpt: 'This is my first post.',
-      guid: 'https://keith.is/post/hello-world',
-      author: 'Keith',
+      title: 'This week in space',
+      slug: 'this-week-in-space',
+      pubDate: '2024-10-7',
+      description: 'This is a summary of the week in space.',
+      excerpt: 'This is a summary of the week in space.',
+      guid: 'https://launchlist.space/post/this-week-in-space',
+      author: 'Richard W.',
     },
   ];
   const feed = generateRss({
-    title: "Keith's Blog",
-    description: 'A blog about web development and other things.',
-    link: 'https://keith.is',
+    title: 'The Launch List Weekly Digest',
+    description:
+      'The latest posts from The Launch List. Weekly updates on space launches, astronauts, and more.',
+    link: 'https://launchlist.space',
     posts: posts.map((post) => ({
       title: post.title,
-      link: `https://keith.is/post/${post.slug}`,
+      link: `https://launchlist.space/post/${post.slug}`,
       description: post.excerpt,
       pubDate: new Date(post.pubDate).toUTCString(),
+      slug: post.slug,
     })),
   });
 
