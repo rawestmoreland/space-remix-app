@@ -1,46 +1,52 @@
-import { IAstronaut } from '~/services/astronautService';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
-import { FootprintsIcon, RocketIcon } from 'lucide-react';
+import { IAstronaut } from '~/services/astronautService';
+import { useMemo } from 'react';
 
 export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
+  const status = useMemo(() => {
+    if (
+      astronaut.status.name === 'Active' ||
+      astronaut.status.name === 'Inactive'
+    ) {
+      return 'secondary';
+    } else if (astronaut.status.name === 'Retired') {
+      return 'outline';
+    } else if (astronaut.status.name === 'Deceased') {
+      return 'destructive';
+    }
+
+    return 'default';
+  }, [astronaut.status.name]);
+
   return (
-    <Card className='h-full'>
-      <CardHeader className='flex flex-row items-center gap-4'>
-        <Avatar className='h-16 w-16'>
-          <AvatarImage src={astronaut.image.image_url} alt={astronaut.name} />
-          <AvatarFallback>
-            {astronaut.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <CardTitle>{astronaut.name}</CardTitle>
-          <Badge
-            variant={
-              astronaut.status.name === 'Active' ? 'default' : 'secondary'
-            }
-          >
-            {astronaut.status.name}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className='flex flex-col gap-4'>
-        <div className='flex gap-2 text-sm'>
-          <Badge variant='default'>
-            <RocketIcon className='mr-2 h-4 w-4' />
-            {astronaut.flights_count}
-          </Badge>
-          <Badge variant='default'>
-            <FootprintsIcon className='mr-2 h-4 w-4' />
-            {astronaut.spacewalks_count}
-          </Badge>
-          <Badge variant='default'>{astronaut.agency.abbrev}</Badge>
-        </div>
+    <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
+      <div className='relative h-48 overflow-hidden bg-muted'>
+        <img
+          src={astronaut.image?.image_url ?? '/placeholder-rocket.jpg'}
+          alt={astronaut.name}
+          className='h-full w-full object-contain transition-transform duration-300 group-hover:scale-105'
+        />
+      </div>
+      <CardContent className='flex-grow p-4'>
+        <h3 className='mb-2 line-clamp-2 text-xl font-bold'>
+          {astronaut.name}
+        </h3>
+        <Badge variant={status}>{astronaut.status.name}</Badge>
+        {/* <div className='mb-2 flex items-center'>
+          <RocketIcon className='mr-2 h-4 w-4 text-muted-foreground' />
+          <TypographyMuted>{}</TypographyMuted>
+        </div> */}
+        {/* <span className='line-clamp-6'>
+          {astronaut.mission?.description ||
+            `We have no details for this mission.`}
+        </span> */}
       </CardContent>
+      <CardFooter className='bg-background pt-4'>
+        <Badge className='line-clamp-1' variant='default'>
+          {astronaut.agency.name}
+        </Badge>
+      </CardFooter>
     </Card>
   );
 }

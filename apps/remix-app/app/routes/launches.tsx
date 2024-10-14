@@ -118,7 +118,10 @@ export default function Launches() {
               ))}
             </div>
             {hasMore && (
-              <div className='mx-auto mt-4 flex w-full items-center justify-center text-center text-primary'>
+              <div
+                ref={loaderRef}
+                className='mx-auto mt-4 flex w-full items-center justify-center text-center text-primary'
+              >
                 <Loader2Icon className='h-8 w-8 animate-spin' />
               </div>
             )}
