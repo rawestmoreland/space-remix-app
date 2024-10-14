@@ -28,7 +28,7 @@ export const sendBatchForSummary = schedules.task({
       },
     });
 
-    if (!unsummarizedArticles) {
+    if (unsummarizedArticles.length < 1) {
       return logger.log("Couldn't find any unsummarized articles");
     }
 
