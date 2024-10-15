@@ -18,6 +18,11 @@ import HyperText from './components/ui/hyper-text';
 import NumberTicker from './components/ui/number-ticker';
 
 export const links: LinksFunction = () => [
+  {
+    rel: 'alternate',
+    href: '/rss.xml',
+    type: 'application/rss+xml',
+  },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
