@@ -20,8 +20,9 @@ import NumberTicker from './components/ui/number-ticker';
 export const links: LinksFunction = () => [
   {
     rel: 'alternate',
-    href: '/rss.xml',
+    href: 'https://launchlist.space/rss.xml',
     type: 'application/rss+xml',
+    title: 'RSS Feed',
   },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
