@@ -68,11 +68,11 @@ export function generateRss({
             <pubDate>${escapeXml(post.pubDate)}</pubDate>
             <link>https://launchlist.space/post/${escapeXml(post.slug)}</link>
             <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
-            <content:encoded><![CDATA[${escapeXml(post.content)}]]></content:encoded>
+            <content:encoded><![CDATA[${post.content}]]></content:encoded>
             <guid isPermaLink="false">${escapeXml(post.link)}</guid>
           </item>`
     )
-    .join('');
+    .join('\n');
 
   const rssFooter = `
       </channel>
