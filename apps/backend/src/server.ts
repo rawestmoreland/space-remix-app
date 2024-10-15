@@ -12,6 +12,7 @@ import requestLogger from '@/common/middleware/requestLogger';
 import { env } from '@/common/utils/envConfig';
 import { countryRouter } from '@/api/country/countryRouter';
 import { prisma } from '@/prisma';
+import { processNewsletterData } from '@/common/utils/processNewsletterData';
 
 const logger = pino({ name: 'server start' });
 const app: Express = express();
@@ -35,7 +36,13 @@ app.use('/users', userRouter);
 app.use('/countries', countryRouter);
 
 app.get('/articles', async (req, res) => {
-  const articles = await prisma.article.findMany();
+  const articles = await prisma.aIArticleSummary.findMany({
+    include: {
+      article: true,
+    },
+  });
+
+  processNewsletterData();
 
   return res.json({ status: 200, data: articles });
 });

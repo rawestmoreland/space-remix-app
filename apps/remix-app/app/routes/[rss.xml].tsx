@@ -1,4 +1,5 @@
 import { LoaderFunction } from '@remix-run/node';
+import { prisma } from '~/db.server';
 
 export type RssPost = {
   title: string;
@@ -8,6 +9,7 @@ export type RssPost = {
   guid?: string;
   author?: string;
   slug: string;
+  content: string;
 };
 
 /**
@@ -29,7 +31,7 @@ export function generateRss({
   posts: RssPost[];
 }): string {
   const rssHeader = `<?xml version="1.0" encoding="UTF-8"?>
-    <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
       <channel>
         <title>${title}</title>
         <description>${description}</description>
@@ -42,10 +44,12 @@ export function generateRss({
     .map(
       (post) => `
           <item>
-            <title><![CDATA[${post.title}]]></title>
-            <description><![CDATA[${post.description}]]></description>
+            <title>${post.title}</title>
+            <description>${post.description}</description>
             <pubDate>${post.pubDate}</pubDate>
             <link>https://launchlist.space/post/${post.slug}</link>
+            <dc:creator>${post.author}</dc:creator>
+            <content:encoded><![CDATA[${post.content}]]></content:encoded>
             <guid isPermaLink="false">${post.link}</guid>
           </item>`
     )
@@ -59,28 +63,22 @@ export function generateRss({
 }
 
 export const loader: LoaderFunction = async () => {
-  const posts = [
-    {
-      title: 'This week in space',
-      slug: 'this-week-in-space',
-      pubDate: '2024-10-7',
-      description: 'This is a summary of the week in space.',
-      excerpt: 'This is a summary of the week in space.',
-      guid: 'https://launchlist.space/post/this-week-in-space',
-      author: 'Richard W.',
-    },
-  ];
+  const posts = await prisma.newsletterPost.findMany();
+
   const feed = generateRss({
     title: 'The Launch List Weekly Digest',
     description:
       'The latest posts from The Launch List. Weekly updates on space launches, astronauts, and more.',
     link: 'https://launchlist.space',
-    posts: posts.map((post) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    posts: posts.map((post: RssPost) => ({
       title: post.title,
       link: `https://launchlist.space/post/${post.slug}`,
-      description: post.excerpt,
+      description: post.description,
       pubDate: new Date(post.pubDate).toUTCString(),
       slug: post.slug,
+      content: post.content,
+      author: post.author,
     })),
   });
 

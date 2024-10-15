@@ -134,6 +134,17 @@ model NewsletterPost {
   description String?
   excerpt String?
   author String @default("Richard W.")
+
+  AINewsletterGeneration AINewsletterGeneration?
+}
+
+model AINewsletterGeneration {
+  id Int @id @default(autoincrement())
+  content String // AI generated content
+  newsletterPostId Int @unique
+  newsletterPost NewsletterPost @relation(fields: [newsletterPostId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }
 
 model ScrapedArticle {

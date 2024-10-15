@@ -22,8 +22,8 @@
     "@anthropic-ai/sdk": "^0.29.0",
     "@asteasolutions/zod-to-openapi": "^7.0.0",
     "@prisma/client": "^5.20.0",
-    "@trigger.dev/sdk": "^3.0.12",
     "@repo/database": "workspace:*",
+    "@trigger.dev/sdk": "^3.0.12",
     "axios": "^1.7.7",
     "body-parser": "^1.20.3",
     "cheerio": "^1.0.0",
@@ -39,6 +39,7 @@
     "pino": "^9.4.0",
     "pino-http": "^10.0.0",
     "swagger-ui-express": "^5.0.0",
+    "xml2js": "^0.6.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -48,6 +49,8 @@
     "@types/express": "^4.17.21",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
+    "@types/xml2js": "^0.4.14",
+    "dotenv-cli": "^7.4.2",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "pino-pretty": "^11.0.0",
