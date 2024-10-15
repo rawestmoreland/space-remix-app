@@ -10,7 +10,7 @@ import {
 
 import './tailwind.css';
 import { Header } from './components/header';
-// import { Footer } from './components/footer';
+import { Footer } from './components/footer';
 import LoadingMask from './components/loading-mask';
 import { LinksFunction } from '@remix-run/react/dist/routeModules';
 import Particles from './components/ui/particles';
@@ -173,7 +173,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Header />
           <LoadingMask />
           {children}
-          {/* <Footer /> */}
+          <Footer />
         </div>
         <ScrollRestoration />
         <Scripts />
