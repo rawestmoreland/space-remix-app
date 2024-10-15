@@ -14,6 +14,7 @@ export type RssPost = {
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&'"]/g, (c) => {
+    return c;
     switch (c) {
       case '&':
         return '&amp;';
