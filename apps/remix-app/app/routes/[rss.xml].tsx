@@ -104,7 +104,7 @@ export const loader: LoaderFunction = async () => {
 
   return new Response(feed, {
     headers: {
-      'Content-Type': 'application/rss+xml',
+      'Content-Type': 'application/xml',
       'Cache-Control': 'public, max-age=2419200',
     },
   });
