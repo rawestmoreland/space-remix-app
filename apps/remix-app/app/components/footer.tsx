@@ -8,9 +8,9 @@ export function Footer() {
         © 2024 Westmoreland Creative LLC. All rights reserved.
       </p>
       <nav className='sm:ml-auto flex gap-4 sm:gap-6'>
-        <Link to='/rss.xml'>
+        <a target='_blank' rel='noreferrer' href='/rss.xml'>
           <RssIcon className='h-8 w-8' />
-        </Link>
+        </a>
         {/* <Link className='text-xs hover:underline underline-offset-4' to='#'>
           Terms of Service
         </Link>
