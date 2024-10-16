@@ -57,6 +57,7 @@ export const scrapeNewArticles = schedules.task({
             data: {
               title: article.title,
               url: article.url,
+              imageUrl: article.image_url ?? undefined,
               publishedAt: new Date(article.published_at),
               source: ArticleSource.SPACEFLIGHT_NEWS_API,
               articleType: ArticleType.ARTICLE,

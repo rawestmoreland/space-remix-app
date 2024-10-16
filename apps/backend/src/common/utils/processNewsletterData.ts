@@ -35,6 +35,10 @@ function processXMLData(xmlData: {
   }));
 }
 
+/**
+ *
+ * @param newsletter - The AI-generated newsletter content - string with XML structure
+ */
 export function processNewsletterData(
   newsletter: string | undefined = sampleResponse
 ) {
@@ -57,23 +61,23 @@ export function processNewsletterData(
       const title = result.weekly_content.newsletter_title[0];
       const summary = result.weekly_content.weekly_summary[0];
       const slug =
-        result.weekly_content.slug[0] ??
+        result.weekly_content?.slug?.[0] ??
         `weekly-newsletter-${new Date().toISOString()}`;
 
       const generatedHTML = `
-        <div><h1>${title ?? 'This Week in Space Exploration'}</h1>${summary && `<p>${result.weekly_content.weekly_summary[0]}</p>`}${processedData
+        <div style="display: flex; flex-direction: column; gap: 24px;"><h1 style="font-size: 28px; font-weight: 700;">${title ?? 'This Week in Space Exploration'}</h1>${summary && `<p>${result.weekly_content.weekly_summary[0]}</p><hr>`}${processedData
           .map(
-            (category) =>
-              `<div><h2>${category.name}</h2>${category.articles
+            (category, index: number) =>
+              `<div style="display: flex; flex-direction: column; gap: 24px;"><h2 style="font-size: 24px; font-weight: 700;">${category.name}</h2>${category.articles
                 .map(
                   (article: any) =>
-                    `<div><h3><a href="${article.link}">${article.title}</a></h3><p>${article.summary}</p><p><strong>Source:</strong> ${article.source}</p></div>`
+                    `<div><div style="display: flex; flex-direction: column; gap: 16px;"><h3 style="font-size: 18px; color: blue; text-decoration: underline; font-weight: 500;"><a href="${article.link}">${article.title}</a></h3><p>${article.summary}</p></div><p style="margin-top: 8px; font-size: 14px;"><b>Source: </b>${article.source}</p></div>`
                 )
-                .join('')}</div>`
+                .join(
+                  ''
+                )}${index !== processedData?.length - 1 ? '<hr>' : ''}</div>`
           )
           .join('')}</div>`;
-
-      console.log(generatedHTML);
     });
   } else {
     console.error('No valid XML content found in the AI response');
@@ -83,10 +87,10 @@ export function processNewsletterData(
 export const sampleResponse = `Here's the processed and structured content for the weekly newsletter:
 <weekly_content>
 <newsletter_title>Space Exploration Leaps Forward: Starship Success and International Cooperation</newsletter_title>
+<weekly_summary>This week in space news, SpaceX achieved a major milestone with its Starship test flight, while Estonia joined the Artemis Accords, strengthening international collaboration in space exploration.</weekly_summary>
 <newsletter>
 <category>Space Technology Innovations</category>
 <newsletter_item>
-<weekly_summary>This week in space news, SpaceX achieved a major milestone with its Starship test flight, while Estonia joined the Artemis Accords, strengthening international collaboration in space exploration.</weekly_summary>
 <slug>starship-success-estonia-artemis-accords-2024-10-13</slug>
 <title>SpaceX's Starship Achieves Major Milestone: Booster Catch and Suborbital Flight</title>
 <summary>SpaceX's fifth Starship test flight marked a significant leap in reusable rocket technology. The Super Heavy booster was successfully caught by mechanical arms after separation, while the Starship upper stage reached a suborbital altitude of 212 kilometers. This achievement brings SpaceX closer to its goal of frequent, reusable space launches.</summary>

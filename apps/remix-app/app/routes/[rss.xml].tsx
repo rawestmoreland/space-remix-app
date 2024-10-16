@@ -1,3 +1,4 @@
+import { NewsletterPost } from '@prisma/client';
 import { LoaderFunction } from '@remix-run/node';
 import { prisma } from '~/db.server';
 
@@ -58,7 +59,7 @@ export function generateRss({
         <link>${escapeXml(link)}</link>
         <language>en-us</language>
         <ttl>60</ttl>
-        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/rss+xml" />`;
+        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />`;
 
   const rssBody = posts
     .map(
@@ -91,11 +92,13 @@ export const loader: LoaderFunction = async () => {
       'The latest posts from The Launch List. Weekly updates on space launches, astronauts, and more.',
     link: 'https://launchlist.space',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    posts: posts.map((post: RssPost) => ({
+    posts: posts.map((post: NewsletterPost) => ({
       title: post.title,
       link: `https://launchlist.space/post/${post.slug}`,
-      description: post.description,
-      pubDate: new Date(post.pubDate).toUTCString(),
+      description: post.description ?? '',
+      pubDate: post.pubDate
+        ? new Date(post.pubDate).toUTCString()
+        : new Date().toUTCString(),
       slug: post.slug,
       content: post.content,
       author: post.author,

@@ -105,6 +105,7 @@ model Article {
   id Int @id @default(autoincrement())
   sourceId Int
   source ArticleSource @default(SPACEFLIGHT_NEWS_API)
+  imageUrl String?
   url String @unique
   title String
   publishedAt DateTime @default(now())
