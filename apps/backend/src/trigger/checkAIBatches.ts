@@ -102,6 +102,9 @@ export const checkAIBatches = schedules.task({
             case 'expired':
               logger.error(`Batch ${result.custom_id} expired`);
               break;
+            case 'canceled':
+              logger.error(`Batch ${result.custom_id} was canceled`);
+              break;
             default:
               logger.error(`Unknown result: ${result.custom_id}`);
               break;
