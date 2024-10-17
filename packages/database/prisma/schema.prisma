@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-1.0.x", "debian-openssl-3.0.x"]
-  engineType = "binary"
+  engineType    = "binary"
 }
 
 datasource db {
@@ -23,7 +23,7 @@ model Country {
   nationality_name          String
   nationality_name_composed String
   createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt @default(now())
+  updatedAt                 DateTime @default(now()) @updatedAt
 }
 
 model MissionType {
@@ -102,19 +102,19 @@ enum ArticleSource {
 }
 
 model Article {
-  id Int @id @default(autoincrement())
-  sourceId Int
-  source ArticleSource @default(SPACEFLIGHT_NEWS_API)
-  imageUrl String?
-  url String @unique
-  title String
-  publishedAt DateTime @default(now())
-  newsSite String?
-  articleType ArticleType? @default(ARTICLE)
-  keywords String[] @default([])
+  id          Int           @id @default(autoincrement())
+  sourceId    Int
+  source      ArticleSource @default(SPACEFLIGHT_NEWS_API)
+  imageUrl    String?
+  url         String        @unique
+  title       String
+  publishedAt DateTime      @default(now())
+  newsSite    String?
+  articleType ArticleType?  @default(ARTICLE)
+  keywords    String[]      @default([])
 
   AIArticleSummary AIArticleSummary?
-  ScrapedArticle ScrapedArticle?
+  ScrapedArticle   ScrapedArticle?
 
   @@unique([sourceId, source])
 }
@@ -125,57 +125,57 @@ enum NewsletterPostStatus {
 }
 
 model NewsletterPost {
-  id Int @id @default(autoincrement())
-  title String
-  slug String @unique
-  content String // HTML content
-  status NewsletterPostStatus @default(DRAFT)
-  createdAt DateTime @default(now())
-  pubDate DateTime?
+  id          Int                  @id @default(autoincrement())
+  title       String
+  slug        String               @unique
+  content     String // HTML content
+  status      NewsletterPostStatus @default(DRAFT)
+  createdAt   DateTime             @default(now())
+  pubDate     DateTime?
   description String?
-  excerpt String?
-  author String @default("Richard W.")
+  excerpt     String?
+  author      String               @default("Richard W.")
 
   AINewsletterGeneration AINewsletterGeneration?
 }
 
 model AINewsletterGeneration {
-  id Int @id @default(autoincrement())
-  content String // AI generated content
-  newsletterPostId Int @unique
-  newsletterPost NewsletterPost @relation(fields: [newsletterPostId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  id               Int            @id @default(autoincrement())
+  content          String // AI generated content
+  newsletterPostId Int            @unique
+  newsletterPost   NewsletterPost @relation(fields: [newsletterPostId], references: [id])
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now()) @updatedAt
 }
 
 model ScrapedArticle {
-  id Int @id @default(autoincrement())
-  content String
+  id        Int      @id @default(autoincrement())
+  content   String
   createdAt DateTime @default(now())
 
-  articleId Int @unique
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  aiArticleSummaryId Int? @unique
-  aiArticleSummary AIArticleSummary? @relation(fields: [aiArticleSummaryId], references: [id])
+  articleId          Int               @unique
+  article            Article           @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  aiArticleSummaryId Int?              @unique
+  aiArticleSummary   AIArticleSummary? @relation(fields: [aiArticleSummaryId], references: [id])
 }
 
 model AIArticleSummary {
-  id Int @id @default(autoincrement())
-  summary String
-  articleId Int @unique
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  summary   String
+  articleId Int      @unique
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  category String
+  category  String
 
   ScrapedArticle ScrapedArticle?
 }
 
 model MarsAIAssessment {
-  id Int @id @default(autoincrement())
-  assessmentDate DateTime
-  progressScore Float
-  keyDevelopments String
-  challenges String
+  id                Int      @id @default(autoincrement())
+  assessmentDate    DateTime
+  progressScore     Float
+  keyDevelopments   String
+  challenges        String
   overallAssessment String
 }
 
@@ -251,10 +251,11 @@ enum BatchStatus {
 }
 
 model AIBatch {
-  id Int @id @default(autoincrement())
-  batchId String
+  id               Int         @id @default(autoincrement())
+  batchId          String
   processingStatus BatchStatus @default(in_progress)
   batchCompletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  metadata         Json?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now()) @updatedAt
 }

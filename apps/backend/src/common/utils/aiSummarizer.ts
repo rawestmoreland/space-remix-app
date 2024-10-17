@@ -105,6 +105,9 @@ export async function createSummaryBatch(articles: IRawArticle[]) {
       data: {
         batchId: message_batch.id,
         processingStatus: message_batch.processing_status,
+        metadata: [
+          ...articles.map((article) => ({ articleId: article.articleId })),
+        ],
       },
     });
 

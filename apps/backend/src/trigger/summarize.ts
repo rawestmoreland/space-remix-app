@@ -28,13 +28,33 @@ export const sendBatchForSummary = schedules.task({
       },
     });
 
-    if (unsummarizedArticles.length < 1) {
+    const batchData = await prisma.aIBatch.findMany({
+      where: {
+        processingStatus: 'in_progress',
+      },
+    });
+
+    // Filter out articles that are already in a batch. Batches may contain metadata [{articleId: string}, {articleId: string}]
+    const articlesInBatches = batchData.flatMap(
+      (batch) => (batch.metadata as { articleId: string }[]) || []
+    );
+    // Filter out articles that are already in a batch
+    const unsummarizedArticlesFiltered = unsummarizedArticles.filter(
+      (article) => {
+        return !articlesInBatches.some(
+          (articleInBatch: { articleId: string }) =>
+            articleInBatch.articleId === article.id.toString()
+        );
+      }
+    );
+
+    if (unsummarizedArticlesFiltered.length < 1) {
       return logger.log("Couldn't find any unsummarized articles");
     }
 
-    logger.log(`Summarizing ${unsummarizedArticles.length} articles`);
+    logger.log(`Summarizing ${unsummarizedArticlesFiltered.length} articles`);
 
-    const articlesContent: IRawArticle[] = unsummarizedArticles
+    const articlesContent: IRawArticle[] = unsummarizedArticlesFiltered
       .filter((article) => article.ScrapedArticle?.content)
       .map((article) => {
         return {
