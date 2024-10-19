@@ -33,7 +33,7 @@ export default function StarshipDashboard() {
         <div className='mb-4 mt-4'>
           <TypographyH1>Starship Dashboard</TypographyH1>
         </div>
-        <Tabs defaultValue='updates' className='w-full'>
+        <Tabs defaultValue='live-streams' className='w-full'>
           <TabsList className='grid w-full grid-cols-3'>
             <TabsTrigger value='live-streams'>Live Streams</TabsTrigger>
             <TabsTrigger value='vehicles'>Vehicles</TabsTrigger>
