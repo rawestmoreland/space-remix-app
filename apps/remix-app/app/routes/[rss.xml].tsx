@@ -1,4 +1,4 @@
-import { NewsletterPost } from '@prisma/client';
+import { NewsletterPost, NewsletterPostStatus } from '@prisma/client';
 import { LoaderFunction } from '@remix-run/node';
 import { prisma } from '~/db.server';
 
@@ -59,7 +59,9 @@ export function generateRss({
         <link>${escapeXml(link)}</link>
         <language>en-us</language>
         <ttl>60</ttl>
-        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />`;
+        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />
+        <atom:updated>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:updated>
+        <atom:published>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:published>`;
 
   const rssBody = posts
     .map(
@@ -84,7 +86,11 @@ export function generateRss({
 }
 
 export const loader: LoaderFunction = async () => {
-  const posts = await prisma.newsletterPost.findMany();
+  const posts = await prisma.newsletterPost.findMany({
+    where: {
+      status: NewsletterPostStatus.PUBLISHED,
+    },
+  });
 
   const feed = generateRss({
     title: 'The Launch List Weekly Digest',

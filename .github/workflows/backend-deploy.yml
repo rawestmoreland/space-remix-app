@@ -315,4 +315,4 @@ jobs:
       - name: 🚀 Deploy to trigger.dev
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
-        run: pnpm dlx trigger.dev@latest deploy apps/backend
+        run: pnpm dlx trigger.dev@3.0.13 deploy apps/backend

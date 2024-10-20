@@ -1,17 +1,152 @@
 import { escapeXml, extractWeeklyContent } from '@/common/utils/regex';
 import xml2js from 'xml2js';
+import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
 
-function processXMLData(xmlData: {
-  newsletter_item: {
-    category: string[];
-    title: string[];
-    link: string[];
-    summary: string[];
-    source: string[];
-    published_at: string[];
-  }[];
-}) {
-  const categories: Record<string, any> = {};
+const articleSchema = z.object({
+  title: z.string(),
+  link: z.string().url(),
+  source: z.string(),
+  summary: z.string(),
+  published_at: z.string(),
+});
+
+const categorySchema = z.object({
+  name: z.string(),
+  articles: z.array(articleSchema),
+});
+
+const weeklyContentSchema = z.object({
+  newsletter_title: z.array(z.string()).length(1),
+  weekly_summary: z.array(z.string()).length(1),
+  slug: z.array(z.string()).length(1).optional(),
+  newsletter: z.array(
+    z.object({
+      newsletter_item: z.array(
+        z.object({
+          category: z.array(z.string()),
+          title: z.array(z.string()),
+          link: z.array(z.string()),
+          summary: z.array(z.string()),
+          source: z.array(z.string()),
+          published_at: z.array(z.string()),
+        })
+      ),
+    })
+  ),
+});
+
+export const newsletterSchema = z.object({
+  title: z.string(),
+  summary: z.string(),
+  slug: z.string(),
+  generatedHTML: z.string(),
+});
+
+type NewsletterData = z.infer<typeof newsletterSchema>;
+type NewsletterResult = NewsletterData | { error: string };
+
+/**
+ *
+ * @param newsletter - The AI-generated newsletter content - string with XML structure
+ */
+export async function processNewsletterData(
+  newsletter: string = sampleResponse
+): Promise<NewsletterResult> {
+  const xmlData = extractWeeklyContent(newsletter);
+
+  if (!xmlData) {
+    return { error: 'No weekly content found' };
+  }
+
+  const escapedXmlData = escapeXml(xmlData);
+
+  return new Promise<NewsletterResult>((resolve) => {
+    xml2js.parseString(escapedXmlData, (err, result) => {
+      if (err) {
+        resolve({ error: `Error parsing XML: ${err}` });
+        return;
+      }
+
+      try {
+        const validatedContent = weeklyContentSchema.parse(
+          result.weekly_content
+        );
+        const processedData = processXMLData(validatedContent.newsletter[0]);
+
+        const title = validatedContent.newsletter_title[0];
+        const summary = validatedContent.weekly_summary[0];
+        const slug =
+          validatedContent.slug?.[0] ??
+          `weekly-newsletter-${new Date().toISOString()}`;
+
+        const generatedHTML = generateHTML(title, summary, processedData);
+
+        const newsletterData = {
+          title,
+          summary,
+          slug,
+          generatedHTML,
+        };
+
+        const validatedNewsletterData = newsletterSchema.parse(newsletterData);
+        resolve(validatedNewsletterData);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          resolve({
+            error: `Validation error: ${error.errors.map((e) => e.message).join(', ')}`,
+          });
+        } else {
+          resolve({ error: `Unexpected error: ${error}` });
+        }
+      }
+    });
+  });
+}
+
+export async function generateNewsletterXML(
+  data: any,
+  logger?: { log: (arg0: string) => void } | undefined
+): Promise<string> {
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
+
+  const msg = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20240620',
+    max_tokens: 3000,
+    temperature: 0,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `You will be given two sets of data: article data and summary data. Your task is to process this information and generate structured content for a weekly newsletter and a blog post page. Here's the data you'll be working with:\n\n<article_data>\n{{${JSON.stringify(data)}}}\n</article_data>\n\nYour goal is to create consistent, structured data that can be used to fill an HTML template for both a newsletter and a blog post page. Follow these steps to process the information and generate the required content:\n\n1. Analyze the provided data:\n   - Extract the relevant information from the article data (URL, news agency)\n\n   - Review the summary data, including the AI-generated summary and category for each article\n\n2. For the newsletter content, create the following structure for each article:\n   <newsletter_item>\n   <title>[Insert catchy title based on the article content]</title>\n   <summary>[Provide a brief, engaging summary of the article in 2-3 sentences]</summary>\n   <category>[Insert the category from the summary data]</category>\n   <published_at>[Insert the published_at date for the article]</published_at>\n   <source>[Insert the news agency from the article data]</source>\n   <link>[Insert the URL from the article data]</link>\n   </newsletter_item>\n\n\n3. Organize the content:\n   - Group the newsletter items by category\n   - Sort the newsletter content by relevance or importance (use your judgment based on the content)\n\n4. Generate the final output in the following format:\n   <weekly_content>\n   <newsletter_title>[Insert a title for this week's newsletter]</newsletter_title>\n   <weekly_summary>[A brief summary of space new this week]</weekly_summary>\n   <slug>[Insert a slugified string to be used as an identifier for the newsletter post]</slug>\n   <newsletter>\n   [Insert all newsletter items, grouped by category]\n   </newsletter>\n   </weekly_content>\n\nEnsure that your writing style is consistent, engaging, and appropriate for a professional newsletter and blog. Use clear and concise language, and maintain a neutral tone while highlighting the importance of each article.`,
+          },
+        ],
+      },
+    ],
+  });
+
+  if (logger) {
+    logger.log(JSON.stringify(msg, null, 2));
+  }
+
+  if (msg.stop_reason === 'max_tokens') {
+    throw new Error('Max tokens exceeded');
+  }
+
+  if (msg.content[0].type === 'text') {
+    return msg.content[0].text;
+  }
+  return '';
+}
+
+function processXMLData(
+  xmlData: z.infer<typeof weeklyContentSchema>['newsletter'][0]
+) {
+  const categories: Record<string, z.infer<typeof articleSchema>[]> = {};
 
   xmlData.newsletter_item.forEach((item) => {
     const category = item.category[0];
@@ -29,59 +164,47 @@ function processXMLData(xmlData: {
     });
   });
 
-  return Object.entries(categories).map(([name, articles]) => ({
-    name,
-    articles,
-  }));
+  return Object.entries(categories).map(([name, articles]) =>
+    categorySchema.parse({ name, articles })
+  );
 }
 
-/**
- *
- * @param newsletter - The AI-generated newsletter content - string with XML structure
- */
-export function processNewsletterData(
-  newsletter: string | undefined = sampleResponse
+function generateHTML(
+  title: string,
+  summary: string,
+  processedData: z.infer<typeof categorySchema>[]
 ) {
-  // Get rid of the "non-whitespace" characters at the beginning and end of the string
-  let xmlData = extractWeeklyContent(newsletter);
-
-  if (xmlData) {
-    // Escape the XML content to avoid parsing errors
-    xmlData = escapeXml(xmlData);
-
-    // Parse the XML content
-    xml2js.parseString(xmlData, (err, result) => {
-      if (err) {
-        console.error(`Error parsing XML: ${err}`);
-        return;
-      }
-
-      const processedData = processXMLData(result.weekly_content.newsletter[0]);
-
-      const title = result.weekly_content.newsletter_title[0];
-      const summary = result.weekly_content.weekly_summary[0];
-      const slug =
-        result.weekly_content?.slug?.[0] ??
-        `weekly-newsletter-${new Date().toISOString()}`;
-
-      const generatedHTML = `
-        <div style="display: flex; flex-direction: column; gap: 24px;"><h1 style="font-size: 28px; font-weight: 700;">${title ?? 'This Week in Space Exploration'}</h1>${summary && `<p>${result.weekly_content.weekly_summary[0]}</p><hr>`}${processedData
-          .map(
-            (category, index: number) =>
-              `<div style="display: flex; flex-direction: column; gap: 24px;"><h2 style="font-size: 24px; font-weight: 700;">${category.name}</h2>${category.articles
-                .map(
-                  (article: any) =>
-                    `<div><div style="display: flex; flex-direction: column; gap: 16px;"><h3 style="font-size: 18px; color: blue; text-decoration: underline; font-weight: 500;"><a href="${article.link}">${article.title}</a></h3><p>${article.summary}</p></div><p style="margin-top: 8px; font-size: 14px;"><b>Source: </b>${article.source}</p></div>`
-                )
-                .join(
-                  ''
-                )}${index !== processedData?.length - 1 ? '<hr>' : ''}</div>`
-          )
-          .join('')}</div>`;
-    });
-  } else {
-    console.error('No valid XML content found in the AI response');
-  }
+  return `
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <h1 style="font-size: 28px; font-weight: 700;">${title ?? 'This Week in Space Exploration'}</h1>
+      ${summary ? `<p>${summary}</p><hr>` : ''}
+      ${processedData
+        .map(
+          (category, index) => `
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <h2 style="font-size: 24px; font-weight: 700;">${category.name}</h2>
+          ${category.articles
+            .map(
+              (article) => `
+            <div>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <h3 style="font-size: 18px; color: blue; text-decoration: underline; font-weight: 500;">
+                  <a href="${article.link}">${article.title}</a>
+                </h3>
+                <p>${article.summary}</p>
+              </div>
+              <p style="margin-top: 8px; font-size: 14px;"><b>Source: </b>${article.source}</p>
+            </div>
+          `
+            )
+            .join('')}
+          ${index !== processedData.length - 1 ? '<hr>' : ''}
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  `;
 }
 
 export const sampleResponse = `Here's the processed and structured content for the weekly newsletter:

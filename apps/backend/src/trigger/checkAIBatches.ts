@@ -1,5 +1,4 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { IRawArticle } from '@/common/utils/aiSummarizer';
 import { prisma } from '@/prisma';
 import { logger, schedules } from '@trigger.dev/sdk/v3';
 import { extractArticleSummary, extractCategory } from '@/common/utils/regex';
