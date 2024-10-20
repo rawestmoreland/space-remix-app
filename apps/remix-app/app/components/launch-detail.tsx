@@ -4,6 +4,8 @@ import { ScrollArea } from './ui/scroll-area';
 import { ILaunch } from '~/services/launchService';
 import { TypographyH3, TypographyP } from './ui/typography';
 import { ClipboardIcon, RocketIcon } from 'lucide-react';
+import Countdown from 'react-countdown';
+import { type CountdownRenderProps } from 'react-countdown';
 
 export function LaunchDetail({ launch }: { launch: ILaunch }) {
   return (
@@ -39,6 +41,14 @@ export function LaunchDetail({ launch }: { launch: ILaunch }) {
           </div>
         </div>
         <div>
+          <Countdown
+            date={new Date(launch.net)}
+            renderer={(props: CountdownRenderProps) => {
+              return (
+                <div className='font-orbitron font-semibold tracking-wider text-2xl text-green-600'>{`${props.formatted.days}:${props.formatted.hours}:${props.formatted.minutes}:${props.formatted.seconds}`}</div>
+              );
+            }}
+          />
           <TypographyP>{launch.mission.description}</TypographyP>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2'>
