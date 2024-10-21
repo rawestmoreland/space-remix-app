@@ -77,6 +77,6 @@ export const sendBatchForSummary = schedules.task({
     }
 
     // Send the articles to the summarizer as a batch
-    logger.log(JSON.stringify(batchResponse.message, null, 2));
+    return logger.log(JSON.stringify(batchResponse.message, null, 2));
   },
 });
