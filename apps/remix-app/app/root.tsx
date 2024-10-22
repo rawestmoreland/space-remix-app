@@ -1,12 +1,10 @@
 import {
   isRouteErrorResponse,
-  json,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
   useRouteError,
 } from '@remix-run/react';
 
@@ -18,7 +16,6 @@ import { LinksFunction } from '@remix-run/react/dist/routeModules';
 import Particles from './components/ui/particles';
 import HyperText from './components/ui/hyper-text';
 import NumberTicker from './components/ui/number-ticker';
-import axios from 'axios';
 
 export const links: LinksFunction = () => [
   {
@@ -154,17 +151,7 @@ export function ErrorBoundary() {
   }
 }
 
-export const loader = async () => {
-  const response = await axios.get(`${process.env.LL_BASE_URL}/api-throttle`);
-
-  return json({ throttle: response.data });
-};
-
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { throttle } = useLoaderData<typeof loader>();
-
-  console.log(throttle);
-
   return (
     <html lang='en'>
       <head>
@@ -188,7 +175,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div className='flex min-h-screen flex-col'>
-          <Header throttled={Boolean(throttle?.next_use_secs > 0)} />
+          <Header throttled={false} />
           <LoadingMask />
           {children}
           <Footer />

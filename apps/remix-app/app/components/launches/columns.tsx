@@ -23,7 +23,11 @@ export const columns: ColumnDef<ILaunchResult>[] = [
     accessorKey: 'agency',
     header: 'Agency',
     cell: ({ row }) => {
-      const agencies = row.original.mission.agencies;
+      const agencies = row.original.mission?.agencies;
+
+      if (!agencies) {
+        return '';
+      }
 
       const getAgencyName = (name: string) => {
         switch (name) {
@@ -34,7 +38,7 @@ export const columns: ColumnDef<ILaunchResult>[] = [
         }
       };
 
-      return agencies.map((a) => getAgencyName(a.name)).join(', ');
+      return agencies?.map((a) => getAgencyName(a.name)).join(', ');
     },
   },
   {
@@ -48,7 +52,7 @@ export const columns: ColumnDef<ILaunchResult>[] = [
     cell: ({ row }) => {
       return (
         <div className='line-clamp-2 max-w-[300px]'>
-          {row.original.mission.description}
+          {row.original.mission?.description ?? 'No mission description'}
         </div>
       );
     },
