@@ -7,7 +7,7 @@ import { Button } from './ui/button';
 import { navLinks, flattenedNavLinks } from '~/lib/constants';
 import { useState } from 'react';
 
-export function Header() {
+export function Header({ throttled }: { throttled: boolean }) {
   const mobileLinks = flattenedNavLinks(navLinks);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,7 +32,7 @@ export function Header() {
           <RocketIcon className='h-6 w-6 text-primary' />
           <span className='ml-2 text-lg font-bold'>Launch List</span>
         </Link>
-        <NavMenu />
+        <NavMenu throttled={throttled} />
       </nav>
       <Sheet
         open={mobileMenuOpen}

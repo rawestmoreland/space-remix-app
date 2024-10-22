@@ -9,7 +9,9 @@ import {
 } from './ui/navigation-menu';
 import { Link, NavLink } from '@remix-run/react';
 
-export function NavMenu() {
+export function NavMenu({ throttled }: { throttled: boolean }) {
+  if (throttled) return;
+
   return (
     <NavigationMenu>
       <NavigationMenuList className='flex gap-3'>
