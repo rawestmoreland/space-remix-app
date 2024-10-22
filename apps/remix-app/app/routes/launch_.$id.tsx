@@ -31,7 +31,7 @@ export default function LaunchInfo() {
       <div className='grid md:grid-cols-2 gap-8'>
         <AspectRatio ratio={4 / 3} className='bg-muted shadow-xl rounded-xl'>
           <img
-            src={launch.image.image_url ?? '/placeholder-rocket.jpg'}
+            src={launch.image?.image_url ?? '/placeholder-rocket.jpg'}
             alt='Soyuz 2.1b | Kosmos 2570 (Lotos-S1 #8)'
             className='rounded-xl object-cover h-full w-full shadow-xl'
           />
@@ -44,15 +44,24 @@ export default function LaunchInfo() {
           </div>
           <div className='flex items-start space-x-2'>
             <MapPinIcon className='text-green-500 h-4 w-4' />
-            <span>Launch Site: {launch.pad.location.name}</span>
+            <span>
+              Launch Site:{' '}
+              {launch.pad?.location?.name ?? 'No pad information available'}
+            </span>
           </div>
           <div className='flex items-start space-x-2'>
             <RocketIcon className='text-destructive h-4 w-4' />
-            <span>Launch Vehicle: {launch.rocket.configuration.full_name}</span>
+            <span>
+              Launch Vehicle:{' '}
+              {launch.rocket?.configuration?.full_name ??
+                'No launch vehicle details available'}
+            </span>
           </div>
           <div className='flex items-start space-x-2'>
             <InfoIcon className='text-purple-500 h-4 w-4' />
-            <span>Status: {launch.status.name}</span>
+            <span>
+              Status: {launch.status?.name ?? 'No launch status available'}
+            </span>
           </div>
         </div>
       </div>
