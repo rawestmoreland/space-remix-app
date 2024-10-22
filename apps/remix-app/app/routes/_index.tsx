@@ -49,9 +49,10 @@ export const loader = async () => {
     const { data, error } = await getLaunches(
       `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
     );
+
     return json({
       articles: response.data.results,
-      launches: error ? null : data.results,
+      launches: error ? null : data?.results,
       error: null,
     });
   } catch (error) {
@@ -165,7 +166,7 @@ export default function Index() {
               ))}
             </Marquee>
           )}
-          {!!launches.length && (
+          {!!launches?.length && (
             <Marquee reverse pauseOnHover className='[--duration:40s]'>
               {launches.map((launch: ILaunchResult) => (
                 <ArticleCard
