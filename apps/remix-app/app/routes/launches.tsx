@@ -8,7 +8,11 @@ import { useState } from 'react';
 import { columns, DataTable, TSortingState } from '~/components/launches';
 import { StatusFilter } from '~/components/launches/status-filter';
 import { TypographyH1 } from '~/components/ui/typography';
-import { getLaunches, getLaunchStatuses } from '~/services/launchService';
+import {
+  getLaunches,
+  getLaunchStatuses,
+  ILaunchResponse,
+} from '~/services/launchService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const { env } = process;
@@ -38,11 +42,11 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
     getLaunchStatuses(),
   ]);
 
-  if (launchesResponse.error || !launchesResponse.data) {
+  if (launchesResponse.error) {
     throw json({ error: launchesResponse.error }, { status: 500 });
   }
   return json({
-    launches: launchesResponse.data,
+    launches: launchesResponse.data as ILaunchResponse,
     statuses: statusesResponse.data,
   });
 }
@@ -112,8 +116,8 @@ export default function Launches() {
         </div>
         <DataTable
           columns={columns}
-          data={currentData.results}
-          totalCount={currentData.count}
+          data={currentData?.results ?? []}
+          totalCount={currentData?.count ?? 0}
           pageSize={pageLimit}
           pageIndex={page}
           onPageChange={handlePageChange}

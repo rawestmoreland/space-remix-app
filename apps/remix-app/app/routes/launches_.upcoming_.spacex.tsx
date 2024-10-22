@@ -16,7 +16,11 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { TypographyH1 } from '~/components/ui/typography';
-import { getLaunches, ILaunchResult } from '~/services/launchService';
+import {
+  getLaunches,
+  ILaunchResponse,
+  ILaunchResult,
+} from '~/services/launchService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const { env } = process;
@@ -32,19 +36,19 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   queryURL.searchParams.append('ordering', 'net');
 
   const { data, error } = await getLaunches(queryURL.toString());
-  if (error || !data) {
+  if (error) {
     throw json({ error }, { status: 500 });
   }
-  return json({ launches: data });
+  return json({ launches: data as ILaunchResponse });
 }
 
 export default function UpcomingSpaceXLaunches() {
   const { launches } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<ILaunchResult[]>(launches.results);
+  const [items, setItems] = useState<ILaunchResult[]>(launches?.results || []);
   const [limit, setLimit] = useState(40);
-  const [offset, setOffset] = useState(launches.results.length);
-  const [hasMore, setHasMore] = useState(launches.next !== null);
+  const [offset, setOffset] = useState(launches?.results.length ?? 0);
+  const [hasMore, setHasMore] = useState(launches?.next !== null);
 
   const [openDialogId, setOpenDialogId] = useState<string | null>(null);
 
@@ -54,7 +58,7 @@ export default function UpcomingSpaceXLaunches() {
   useEffect(() => {
     if (fetcher.data) {
       setItems((prevItems: ILaunchResult[]) => {
-        const newItems = fetcher.data?.launches.results || [];
+        const newItems = fetcher.data?.launches?.results || [];
         const uniqueNewItems = newItems.filter(
           (newItem: ILaunchResult) =>
             !prevItems.some(
@@ -67,10 +71,10 @@ export default function UpcomingSpaceXLaunches() {
         setHasMore(false);
         return;
       }
-      if (fetcher.data.launches.next === null) {
+      if (fetcher.data.launches?.next === null) {
         setHasMore(false);
       } else {
-        const url = new URL(fetcher.data.launches.next);
+        const url = new URL(fetcher.data.launches?.next ?? '');
         const offset = url.searchParams.get('offset') || '0';
         const limit = url.searchParams.get('limit') || '40';
         setOffset(Number(offset));
