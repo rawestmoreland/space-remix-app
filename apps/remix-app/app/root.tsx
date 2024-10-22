@@ -163,6 +163,8 @@ export const loader = async () => {
 export function Layout({ children }: { children: React.ReactNode }) {
   const { throttle } = useLoaderData<typeof loader>();
 
+  console.log(throttle);
+
   return (
     <html lang='en'>
       <head>
@@ -186,7 +188,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div className='flex min-h-screen flex-col'>
-          <Header throttled={throttle.next_use_secs > 0} />
+          <Header throttled={Boolean(throttle?.next_use_secs > 0)} />
           <LoadingMask />
           {children}
           <Footer />
