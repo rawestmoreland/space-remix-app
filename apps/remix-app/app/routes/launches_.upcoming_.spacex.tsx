@@ -3,11 +3,11 @@ import {
   useLoaderData,
   json,
   ClientLoaderFunctionArgs,
+  Link,
 } from '@remix-run/react';
-import { Loader2Icon } from 'lucide-react';
+import { ExternalLinkIcon, Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { LaunchCard } from '~/components/launch-card';
-import { LaunchDetail } from '~/components/launch-detail';
+import { LaunchCard, LaunchDetail } from '~/components/launches';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { TypographyH1 } from '~/components/ui/typography';
-import { getLaunches, ILaunch } from '~/services/launchService';
+import { getLaunches, ILaunchResult } from '~/services/launchService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const { env } = process;
@@ -32,7 +32,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   queryURL.searchParams.append('ordering', 'net');
 
   const { data, error } = await getLaunches(queryURL.toString());
-  if (error) {
+  if (error || !data) {
     throw json({ error }, { status: 500 });
   }
   return json({ launches: data });
@@ -41,21 +41,25 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 export default function UpcomingSpaceXLaunches() {
   const { launches } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<ILaunch[]>(launches.results);
+  const [items, setItems] = useState<ILaunchResult[]>(launches.results);
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(launches.results.length);
   const [hasMore, setHasMore] = useState(launches.next !== null);
+
+  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
 
   const fetcher = useFetcher<typeof loader>();
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (fetcher.data) {
-      setItems((prevItems: ILaunch[]) => {
+      setItems((prevItems: ILaunchResult[]) => {
         const newItems = fetcher.data?.launches.results || [];
         const uniqueNewItems = newItems.filter(
-          (newItem: ILaunch) =>
-            !prevItems.some((prevItem: ILaunch) => prevItem.id === newItem.id)
+          (newItem: ILaunchResult) =>
+            !prevItems.some(
+              (prevItem: ILaunchResult) => prevItem.id === newItem.id
+            )
         );
         return [...prevItems, ...uniqueNewItems];
       });
@@ -104,8 +108,14 @@ export default function UpcomingSpaceXLaunches() {
         {items.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {items.map((launch: ILaunch) => (
-                <Dialog key={launch.id}>
+              {items.map((launch: ILaunchResult) => (
+                <Dialog
+                  key={launch.id}
+                  open={launch.id == openDialogId}
+                  onOpenChange={(open) =>
+                    setOpenDialogId(open ? launch.id : null)
+                  }
+                >
                   <DialogTrigger asChild>
                     <div className='cursor-pointer'>
                       <LaunchCard launch={launch} />
@@ -113,7 +123,16 @@ export default function UpcomingSpaceXLaunches() {
                   </DialogTrigger>
                   <DialogContent className='max-w-3xl'>
                     <DialogHeader>
-                      <DialogTitle>Launch Details</DialogTitle>
+                      <DialogTitle>
+                        <Link
+                          onClick={() => setOpenDialogId(null)}
+                          className='flex gap-2 items-center hover:underline underline-offset-2'
+                          to={`/launch/${launch.id}`}
+                        >
+                          Launch Details{' '}
+                          <ExternalLinkIcon className='h-4 w-4' />
+                        </Link>
+                      </DialogTitle>
                     </DialogHeader>
                     <LaunchDetail launch={launch} />
                   </DialogContent>

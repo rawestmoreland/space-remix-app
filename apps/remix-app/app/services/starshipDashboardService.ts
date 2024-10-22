@@ -1,4 +1,5 @@
 import axios, { isAxiosError, AxiosError } from 'axios';
+import { getCacheForURL } from '~/lib/redis';
 import { redis } from '~/redis.server';
 
 export interface IStarshipUpdate {
@@ -51,7 +52,7 @@ export interface IStarshipResponse {
 
 export async function getStarshipDashboard(url: string) {
   try {
-    const cachedData = await redis.get(url);
+    const cachedData = await getCacheForURL(url);
 
     if (cachedData) {
       return { data: cachedData, error: null };

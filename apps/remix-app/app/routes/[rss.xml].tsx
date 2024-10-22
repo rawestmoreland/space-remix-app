@@ -64,6 +64,9 @@ export function generateRss({
         <atom:published>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:published>`;
 
   const rssBody = posts
+    .sort(
+      (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+    )
     .map(
       (post) => `
           <item>

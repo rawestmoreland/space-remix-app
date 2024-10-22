@@ -1,11 +1,11 @@
-import { ILaunch } from '~/services/launchService';
-import { Card, CardContent, CardFooter } from './ui/card';
-import { Badge } from './ui/badge';
+import { ILaunchResult } from '~/services/launchService';
+import { Card, CardContent, CardFooter } from '../ui/card';
+import { Badge } from '../ui/badge';
 import { RocketIcon } from 'lucide-react';
 import { formatDate, formatTime } from '~/lib/utils';
-import { TypographyMuted } from './ui/typography';
+import { TypographyMuted } from '../ui/typography';
 
-export function LaunchCard({ launch }: { launch: ILaunch }) {
+export function LaunchCard({ launch }: { launch: ILaunchResult }) {
   return (
     <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
       <div className='relative h-48 overflow-hidden'>

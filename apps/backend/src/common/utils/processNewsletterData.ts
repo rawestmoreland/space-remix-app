@@ -1,4 +1,5 @@
 import { escapeXml, extractWeeklyContent } from '@/common/utils/regex';
+import { emojiMap } from '@/common/utils/emojiMap';
 import xml2js from 'xml2js';
 import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
@@ -29,6 +30,7 @@ const weeklyContentSchema = z.object({
           link: z.array(z.string()),
           summary: z.array(z.string()),
           source: z.array(z.string()),
+          image_url: z.array(z.string()).optional(),
           published_at: z.array(z.string()),
         })
       ),
@@ -114,7 +116,7 @@ export async function generateNewsletterXML(
 
   const msg = await anthropic.messages.create({
     model: 'claude-3-5-sonnet-20240620',
-    max_tokens: 3000,
+    max_tokens: 5000,
     temperature: 0,
     messages: [
       {
@@ -122,7 +124,7 @@ export async function generateNewsletterXML(
         content: [
           {
             type: 'text',
-            text: `You will be given two sets of data: article data and summary data. Your task is to process this information and generate structured content for a weekly newsletter and a blog post page. Here's the data you'll be working with:\n\n<article_data>\n{{${JSON.stringify(data)}}}\n</article_data>\n\nYour goal is to create consistent, structured data that can be used to fill an HTML template for both a newsletter and a blog post page. Follow these steps to process the information and generate the required content:\n\n1. Analyze the provided data:\n   - Extract the relevant information from the article data (URL, news agency)\n\n   - Review the summary data, including the AI-generated summary and category for each article\n\n2. For the newsletter content, create the following structure for each article:\n   <newsletter_item>\n   <title>[Insert catchy title based on the article content]</title>\n   <summary>[Provide a brief, engaging summary of the article in 2-3 sentences]</summary>\n   <category>[Insert the category from the summary data]</category>\n   <published_at>[Insert the published_at date for the article]</published_at>\n   <source>[Insert the news agency from the article data]</source>\n   <link>[Insert the URL from the article data]</link>\n   </newsletter_item>\n\n\n3. Organize the content:\n   - Group the newsletter items by category\n   - Sort the newsletter content by relevance or importance (use your judgment based on the content)\n\n4. Generate the final output in the following format:\n   <weekly_content>\n   <newsletter_title>[Insert a title for this week's newsletter]</newsletter_title>\n   <weekly_summary>[A brief summary of space new this week]</weekly_summary>\n   <slug>[Insert a slugified string to be used as an identifier for the newsletter post]</slug>\n   <newsletter>\n   [Insert all newsletter items, grouped by category]\n   </newsletter>\n   </weekly_content>\n\nEnsure that your writing style is consistent, engaging, and appropriate for a professional newsletter and blog. Use clear and concise language, and maintain a neutral tone while highlighting the importance of each article.`,
+            text: `You will be given two sets of data: article data and summary data. Your task is to process this information and generate structured content for a weekly newsletter and a blog post page. Here's the data you'll be working with:\n\n<article_data>\n{{${JSON.stringify(data)}}}\n</article_data>\n\nYour goal is to create consistent, structured data that can be used to fill an HTML template for both a newsletter and a blog post page. Follow these steps to process the information and generate the required content:\n\n1. Analyze the provided data:\n   - Extract the relevant information from the article data (URL, news agency)\n\n   - Review the summary data, including the AI-generated summary and category for each article\n\n2. For the newsletter content, create the following structure for each article:\n   <newsletter_item>\n   <title>[Insert catchy title based on the article content]</title>\n   <summary>[Provide a brief, engaging summary of the article in 2-3 sentences]</summary>\n   <category>[Insert the category from the summary data]</category>\n   <published_at>[Insert the published_at date for the article]</published_at>\n   <source>[Insert the news agency from the article data]</source>\n   <link>[Insert the URL from the article data]</link>\n <image_url>[If the article has an image_url, include it here]</image_url>\n   </newsletter_item>\n\n\n3. Organize the content:\n   - Group the newsletter items by category\n   - Sort the newsletter content by relevance or importance (use your judgment based on the content)\n\n4. Generate the final output in the following format:\n   <weekly_content>\n   <newsletter_title>[Insert a title for this week's newsletter]</newsletter_title>\n   <weekly_summary>[A brief summary of space new this week]</weekly_summary>\n   <slug>[Insert a slugified string to be used as an identifier for the newsletter post]</slug>\n   <newsletter>\n   [Insert all newsletter items, grouped by category]\n   </newsletter>\n   </weekly_content>\n\nEnsure that your writing style is consistent, engaging, and appropriate for a professional newsletter and blog. Use clear and concise language, and maintain a neutral tone while highlighting the importance of each article.`,
           },
         ],
       },
@@ -182,7 +184,7 @@ function generateHTML(
         .map(
           (category, index) => `
         <div style="display: flex; flex-direction: column; gap: 24px;">
-          <h2 style="font-size: 24px; font-weight: 700;">${category.name}</h2>
+          <h2 style="font-size: 24px; font-weight: 700; text-align: center;">${emojiMap[category.name as keyof typeof emojiMap] ? `${emojiMap[category.name as keyof typeof emojiMap]} ` : ''}${category.name}</h2>
           ${category.articles
             .map(
               (article) => `

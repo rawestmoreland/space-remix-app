@@ -1,4 +1,5 @@
 import axios, { isAxiosError, AxiosError } from 'axios';
+import { getCacheForURL } from '~/lib/redis';
 import { redis } from '~/redis.server';
 
 export interface IAstronaut {
@@ -23,7 +24,7 @@ export interface IAstronaut {
 
 export async function getAstronauts(url: string) {
   try {
-    const cachedData = await redis.get(url);
+    const cachedData = await getCacheForURL(url);
 
     if (cachedData) {
       return { data: cachedData, error: null };

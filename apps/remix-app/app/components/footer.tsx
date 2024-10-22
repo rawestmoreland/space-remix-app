@@ -1,4 +1,3 @@
-import { Link } from '@remix-run/react';
 import { RssIcon } from 'lucide-react';
 
 export function Footer() {
@@ -9,7 +8,7 @@ export function Footer() {
       </p>
       <nav className='sm:ml-auto flex gap-4 sm:gap-6'>
         <a target='_blank' rel='noreferrer' href='/rss.xml'>
-          <RssIcon className='h-8 w-8' />
+          <RssIcon className='h-4 w-4' />
         </a>
         {/* <Link className='text-xs hover:underline underline-offset-4' to='#'>
           Terms of Service

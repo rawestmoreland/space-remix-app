@@ -1,13 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
-import { ILaunch } from '~/services/launchService';
-import { TypographyH3, TypographyP } from './ui/typography';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { ScrollArea } from '../ui/scroll-area';
+import { ILaunchResult } from '~/services/launchService';
+import { TypographyH3, TypographyP } from '../ui/typography';
 import { ClipboardIcon, RocketIcon } from 'lucide-react';
 import Countdown from 'react-countdown';
 import { type CountdownRenderProps } from 'react-countdown';
 
-export function LaunchDetail({ launch }: { launch: ILaunch }) {
+export function LaunchDetail({ launch }: { launch: ILaunchResult }) {
+  const alreadyLaunched = new Date(launch.net) < new Date();
+
   return (
     <ScrollArea className='max-h-[80vh] pr-4'>
       <div className='flex flex-col gap-4'>
@@ -41,14 +43,16 @@ export function LaunchDetail({ launch }: { launch: ILaunch }) {
           </div>
         </div>
         <div>
-          <Countdown
-            date={new Date(launch.net)}
-            renderer={(props: CountdownRenderProps) => {
-              return (
-                <div className='font-orbitron font-semibold tracking-wider text-2xl text-green-600'>{`${props.formatted.days}:${props.formatted.hours}:${props.formatted.minutes}:${props.formatted.seconds}`}</div>
-              );
-            }}
-          />
+          {!alreadyLaunched && (
+            <Countdown
+              date={new Date(launch.net)}
+              renderer={(props: CountdownRenderProps) => {
+                return (
+                  <div className='font-orbitron font-semibold tracking-wider text-2xl text-green-600'>{`${props.formatted.days}:${props.formatted.hours}:${props.formatted.minutes}:${props.formatted.seconds}`}</div>
+                );
+              }}
+            />
+          )}
           <TypographyP>{launch.mission.description}</TypographyP>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2'>

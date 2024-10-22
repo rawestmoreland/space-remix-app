@@ -1,22 +1,14 @@
 import {
   ClientLoaderFunctionArgs,
-  useFetcher,
   useLoaderData,
   json,
+  useFetcher,
 } from '@remix-run/react';
-import { Loader2Icon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { LaunchCard } from '~/components/launch-card';
-import { LaunchDetail } from '~/components/launch-detail';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
+import { useState } from 'react';
+import { columns, DataTable, TSortingState } from '~/components/launches';
+import { StatusFilter } from '~/components/launches/status-filter';
 import { TypographyH1 } from '~/components/ui/typography';
-import { getLaunches, ILaunch } from '~/services/launchService';
+import { getLaunches, getLaunchStatuses } from '~/services/launchService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const { env } = process;
@@ -24,113 +16,111 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   const url = new URL(request.url);
 
   const offset = url.searchParams.get('offset') || '0';
-  const limit = url.searchParams.get('limit') || '40';
+  const limit = url.searchParams.get('limit') || '10';
+  const ordering = url.searchParams.get('ordering') || 'net';
+  const statusId = url.searchParams.get('status') || '';
+
+  // Only allow valid column names to be used for sorting
+  const validSortColumns = ['net', '-net', 'name', '-name']; // Add more as needed
+  const sanitizedOrdering = validSortColumns.includes(ordering)
+    ? ordering
+    : 'net';
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
-  queryURL.searchParams.append('ordering', 'net');
-
-  const { data, error } = await getLaunches(queryURL.toString());
-  if (error) {
-    throw json({ error }, { status: 500 });
+  queryURL.searchParams.append('ordering', sanitizedOrdering);
+  if (statusId && statusId !== 'all') {
+    queryURL.searchParams.append('status', statusId);
   }
-  return json({ launches: data });
+
+  const [launchesResponse, statusesResponse] = await Promise.all([
+    getLaunches(queryURL.toString()),
+    getLaunchStatuses(),
+  ]);
+
+  if (launchesResponse.error || !launchesResponse.data) {
+    throw json({ error: launchesResponse.error }, { status: 500 });
+  }
+  return json({
+    launches: launchesResponse.data,
+    statuses: statusesResponse.data,
+  });
 }
 
 export default function Launches() {
-  const { launches } = useLoaderData<typeof loader>();
+  const { launches, statuses } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<ILaunch[]>(launches.results);
-  const [limit, setLimit] = useState(40);
-  const [offset, setOffset] = useState(launches.results.length);
-  const [hasMore, setHasMore] = useState(launches.next !== null);
+  const pageLimit = 10;
+  const [page, setPage] = useState(0);
+  const [sorting, setSorting] = useState<TSortingState>({
+    id: 'net',
+    desc: false,
+  });
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const fetcher = useFetcher();
 
-  const fetcher = useFetcher<typeof loader>();
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchData(newPage, sorting, selectedStatus);
+  };
 
-  useEffect(() => {
-    if (fetcher.data) {
-      setItems((prevItems: ILaunch[]) => {
-        const newItems = fetcher.data?.launches.results || [];
-        const uniqueNewItems = newItems.filter(
-          (newItem: ILaunch) =>
-            !prevItems.some((prevItem: ILaunch) => prevItem.id === newItem.id)
-        );
-        return [...prevItems, ...uniqueNewItems];
-      });
-      if (!fetcher.data.launches?.next === null) {
-        setHasMore(false);
-        return;
-      }
-      if (fetcher.data.launches.next === null) {
-        setHasMore(false);
-      } else {
-        const url = new URL(fetcher.data.launches.next);
-        const offset = url.searchParams.get('offset') || '0';
-        const limit = url.searchParams.get('limit') || '40';
-        setOffset(Number(offset));
-        setLimit(Number(limit));
-      }
-    }
-  }, [fetcher.data]);
+  const handleSortingChange = (newSorting: TSortingState) => {
+    setSorting(newSorting);
+    setPage(0);
+    fetchData(0, newSorting, selectedStatus);
+  };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
-          fetcher.load(`/launches?offset=${offset}&limit=${limit}`);
-        }
-      },
-      { threshold: 1 }
-    );
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+    setPage(0);
+    fetchData(0, sorting, newStatus);
+  };
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
+  const fetchData = (
+    pageIndex: number,
+    sortState: TSortingState,
+    status: string
+  ) => {
+    const offset = pageIndex * pageLimit;
+    const orderingParam = sortState.desc ? `-${sortState.id}` : sortState.id;
+
+    let url = `?offset=${offset}&limit=${pageLimit}&ordering=${orderingParam}`;
+    if (status && status !== 'all') {
+      url += `&status=${status}`;
     }
 
-    return () => observer.disconnect();
-  }, [hasMore, offset, limit, fetcher]);
+    fetcher.load(url);
+  };
+
+  const currentData =
+    (fetcher.data as { launches: typeof launches })?.launches || launches;
 
   return (
     <main className='flex-1'>
-      <div className='mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
+      <div className='mx-auto w-full max-w-6xl px-4 md:px-0 flex flex-col gap-4'>
         <div className='my-4'>
           <TypographyH1>Launches</TypographyH1>
         </div>
-        {items?.length > 0 ? (
-          <>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {items.map((launch: ILaunch) => (
-                <Dialog key={launch.id}>
-                  <DialogTrigger asChild>
-                    <div className='cursor-pointer'>
-                      <LaunchCard launch={launch} />
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className='max-w-3xl'>
-                    <DialogHeader>
-                      <DialogTitle>Launch Details</DialogTitle>
-                    </DialogHeader>
-                    <LaunchDetail launch={launch} />
-                  </DialogContent>
-                </Dialog>
-              ))}
-            </div>
-            {hasMore && (
-              <div
-                ref={loaderRef}
-                className='mx-auto mt-4 flex w-full items-center justify-center text-center text-primary'
-              >
-                <Loader2Icon className='h-8 w-8 animate-spin' />
-              </div>
-            )}
-          </>
-        ) : (
-          <div ref={loaderRef} className='text-center'>
-            No upcoming launches
+        <div className='w-full flex justify-end'>
+          <div>
+            <StatusFilter
+              statuses={statuses.results}
+              selectedStatus={selectedStatus}
+              onStatusChange={handleStatusChange}
+            />
           </div>
-        )}
+        </div>
+        <DataTable
+          columns={columns}
+          data={currentData.results}
+          totalCount={currentData.count}
+          pageSize={pageLimit}
+          pageIndex={page}
+          onPageChange={handlePageChange}
+          onSortingChange={handleSortingChange}
+          sorting={sorting}
+          isLoading={fetcher.state === 'loading'}
+        />
       </div>
     </main>
   );

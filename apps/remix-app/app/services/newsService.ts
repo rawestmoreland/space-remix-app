@@ -1,5 +1,6 @@
 import type { AxiosError } from 'axios';
 import axios, { isAxiosError } from 'axios';
+import { getCacheForURL } from '~/lib/redis';
 import { redis } from '~/redis.server';
 
 export interface IArticle {
@@ -15,7 +16,7 @@ export interface IArticle {
 
 export async function getArticles(url: string) {
   try {
-    const cachedData = await redis.get(url);
+    const cachedData = await getCacheForURL(url);
 
     if (cachedData) {
       return { data: cachedData, error: null };

@@ -15,8 +15,6 @@ export async function loader() {
 export default function Posts() {
   const { posts } = useLoaderData<typeof loader>();
 
-  console.log(posts);
-
   // Parse date fields back into Date objects
   const parsedPosts = posts.map((post) => ({
     ...post,

@@ -22,7 +22,7 @@ import { Input } from '~/components/ui/input';
 import Marquee from '~/components/ui/marquee';
 import { ITestimonial, testimonials } from '~/lib/constants';
 import { cn } from '~/lib/utils';
-import { getLaunches, ILaunch } from '~/services/launchService';
+import { getLaunches, ILaunchResult } from '~/services/launchService';
 import { IArticle } from '~/services/newsService';
 import { createContact } from '~/services/sendfoxService';
 
@@ -167,7 +167,7 @@ export default function Index() {
           )}
           {!!launches.length && (
             <Marquee reverse pauseOnHover className='[--duration:40s]'>
-              {launches.map((launch: ILaunch) => (
+              {launches.map((launch: ILaunchResult) => (
                 <ArticleCard
                   key={launch.id}
                   url='#'
