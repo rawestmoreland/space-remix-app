@@ -25,7 +25,7 @@ import { commitUrlSession, getUrlSession } from '~/sessions.server';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const session = await getUrlSession(request.headers.get('Cookie'));
-  session.set('launchContext', request.url);
+  session.set('urlContext', request.url);
 
   const { env } = process;
   const queryURL = new URL(`${env.LL_BASE_URL}/launches/upcoming`);
