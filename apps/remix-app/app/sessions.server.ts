@@ -10,7 +10,7 @@ const themeSessionStorage = createCookieSessionStorage({
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secrets: ['s3cr3t'],
+    secrets: [`${process.env.SESSION_SECRET}`],
     // Set domain and secure only if in production
     ...(isProduction
       ? { domain: 'your-production-domain.com', secure: true }
@@ -28,7 +28,7 @@ const urlSessionStorage = createCookieSessionStorage({
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secrets: ['s3cr3t'], // Can use the same secret as theme
+    secrets: [`${process.env.SESSION_SECRET}`], // Can use the same secret as theme
     ...(isProduction ? { domain: 'launchlist.space', secure: true } : {}),
   },
 });

@@ -3,6 +3,7 @@
   "ui": "tui",
   "globalDependencies": [".env"],
   "globalEnv": [
+    "SESSION_SECRET",
     "NODE_ENV",
     "DATABASE_URL",
     "LL_BASE_URL",
