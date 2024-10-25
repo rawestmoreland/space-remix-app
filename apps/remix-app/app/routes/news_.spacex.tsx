@@ -21,6 +21,7 @@ export const loader = async ({ request }: ClientLoaderFunctionArgs) => {
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
+  queryURL.searchParams.append('search', 'spacex');
   queryURL.searchParams.append('ordering', '-published_at');
 
   const { data, error } = await getArticles(queryURL.toString());
@@ -30,7 +31,7 @@ export const loader = async ({ request }: ClientLoaderFunctionArgs) => {
   return { articles: data };
 };
 
-export default function News() {
+export default function SpaceXNews() {
   const { articles } = useLoaderData<typeof loader>();
 
   const [items, setItems] = useState<IArticle[]>(articles.results);
@@ -89,12 +90,12 @@ export default function News() {
     <main className='flex-1'>
       <div className='mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
         <div className='my-4'>
-          <TypographyH1>Space News</TypographyH1>
+          <TypographyH1>SpaceX News</TypographyH1>
         </div>
         <div>
           <TypographyMuted>
-            The latest news from the space industry, including SpaceX, NASA, and
-            more.
+            The latest news about SpaceX, the aerospace manufacturer and space
+            transportation company founded by Elon Musk.
           </TypographyMuted>
         </div>
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>

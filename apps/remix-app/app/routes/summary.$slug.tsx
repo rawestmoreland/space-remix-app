@@ -18,7 +18,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return json({ post });
 }
 
-export default function Post() {
+export default function Summary() {
   const { post } = useLoaderData<typeof loader>();
 
   return (

@@ -6,6 +6,10 @@ interface RateLimitStatus {
 }
 
 export async function checkRateLimit(): Promise<RateLimitStatus> {
+  if (process.env.NODE_ENV === 'development') {
+    return { canProceed: true, remainingCalls: 15 };
+  }
+
   const key = 'api_calls_count';
   const timeWindow = 3600; // 1 hour in seconds
 
@@ -35,6 +39,8 @@ export async function checkRateLimit(): Promise<RateLimitStatus> {
 }
 
 export async function updateRateLimitTracking(): Promise<void> {
+  if (process.env.NODE_ENV === 'development') return;
+
   const key = 'api_calls_count';
   const timeWindow = 3600; // 1 hour in seconds
 

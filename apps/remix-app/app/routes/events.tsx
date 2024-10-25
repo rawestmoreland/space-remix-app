@@ -5,22 +5,15 @@ import {
   json,
   Link,
 } from '@remix-run/react';
-import { ExternalLinkIcon, Loader2Icon } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { LaunchCard, LaunchDetail } from '~/components/launches';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
+import { EventCard } from '~/components/events';
 import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
-  getLaunches,
-  ILaunchResponse,
-  ILaunchResult,
-} from '~/services/launchService';
+  getEvents,
+  IEventResponse,
+  IEventResult,
+} from '~/services/eventsService';
 import { commitUrlSession, getUrlSession } from '~/sessions.server';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
@@ -28,7 +21,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   session.set('urlContext', request.url);
 
   const { env } = process;
-  const queryURL = new URL(`${env.LL_BASE_URL}/launches/upcoming`);
+  const queryURL = new URL(`${env.LL_BASE_URL}/events/upcoming`);
   const url = new URL(request.url);
 
   const offset = url.searchParams.get('offset') || '0';
@@ -38,51 +31,49 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   queryURL.searchParams.append('limit', limit);
   queryURL.searchParams.append('ordering', 'net');
 
-  const { data, error } = await getLaunches(queryURL.toString());
+  const { data, error } = await getEvents(queryURL.toString());
   if (error) {
     throw json({ error }, { status: 500 });
   }
   return json(
-    { launches: data as ILaunchResponse },
+    { events: data as IEventResponse },
     {
       headers: { 'Set-Cookie': await commitUrlSession(session) },
     }
   );
 }
 
-export default function UpcomingLaunches() {
-  const { launches } = useLoaderData<typeof loader>();
+export default function UpcomingEvents() {
+  const { events } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<ILaunchResult[]>(launches.results);
+  const [items, setItems] = useState<IEventResult[]>(events.results);
   const [limit, setLimit] = useState(40);
-  const [offset, setOffset] = useState(launches.results.length);
-  const [hasMore, setHasMore] = useState(launches.next !== null);
-
-  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
+  const [offset, setOffset] = useState(events.results.length);
+  const [hasMore, setHasMore] = useState(events.next !== null);
 
   const fetcher = useFetcher<typeof loader>();
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (fetcher.data) {
-      setItems((prevItems: ILaunchResult[]) => {
-        const newItems = fetcher.data?.launches.results || [];
+      setItems((prevItems: IEventResult[]) => {
+        const newItems = fetcher.data?.events.results || [];
         const uniqueNewItems = newItems.filter(
-          (newItem: ILaunchResult) =>
+          (newItem: IEventResult) =>
             !prevItems.some(
-              (prevItem: ILaunchResult) => prevItem.id === newItem.id
+              (prevItem: IEventResult) => prevItem.id === newItem.id
             )
         );
         return [...prevItems, ...uniqueNewItems];
       });
-      if (!fetcher.data.launches?.next === null) {
+      if (!fetcher.data.events?.next === null) {
         setHasMore(false);
         return;
       }
-      if (fetcher.data.launches.next === null) {
+      if (fetcher.data.events.next === null) {
         setHasMore(false);
       } else {
-        const url = new URL(fetcher.data.launches.next);
+        const url = new URL(fetcher.data.events.next);
         const offset = url.searchParams.get('offset') || '0';
         const limit = url.searchParams.get('limit') || '40';
         setOffset(Number(offset));
@@ -96,7 +87,7 @@ export default function UpcomingLaunches() {
       (entries) => {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
-          fetcher.load(`/launches/upcoming?offset=${offset}&limit=${limit}`);
+          fetcher.load(`/events/upcoming?offset=${offset}&limit=${limit}`);
         }
       },
       { threshold: 1 }
@@ -113,43 +104,21 @@ export default function UpcomingLaunches() {
     <main className='flex-1'>
       <div className='mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
         <div className='my-4'>
-          <TypographyH1>Upcoming Launches</TypographyH1>
+          <TypographyH1>Upcoming Events</TypographyH1>
         </div>
-        <TypographyMuted>
-          Launches that are scheduled to occur in the future
-        </TypographyMuted>
+        <div>
+          <TypographyMuted>
+            Stay up-to-date with the latest events happening in the space
+            industry
+          </TypographyMuted>
+        </div>
         {items?.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>
-              {items.map((launch: ILaunchResult) => (
-                <Dialog
-                  key={launch.id}
-                  open={launch.id == openDialogId}
-                  onOpenChange={(open) =>
-                    setOpenDialogId(open ? launch.id : null)
-                  }
-                >
-                  <DialogTrigger asChild>
-                    <div className='cursor-pointer'>
-                      <LaunchCard launch={launch} />
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className='max-w-3xl'>
-                    <DialogHeader>
-                      <DialogTitle>
-                        <Link
-                          onClick={() => setOpenDialogId(null)}
-                          className='flex gap-2 items-center hover:underline underline-offset-2'
-                          to={`/launch/${launch.id}`}
-                        >
-                          Launch Details{' '}
-                          <ExternalLinkIcon className='h-4 w-4' />
-                        </Link>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <LaunchDetail launch={launch} />
-                  </DialogContent>
-                </Dialog>
+              {items.map((event: IEventResult) => (
+                <Link to={`/event/${event.id}`} key={`event-${event.id}`}>
+                  <EventCard event={event} />
+                </Link>
               ))}
             </div>
             {hasMore && (
@@ -163,7 +132,7 @@ export default function UpcomingLaunches() {
           </>
         ) : (
           <div ref={loaderRef} className='text-center'>
-            No upcoming launches
+            No upcoming events
           </div>
         )}
       </div>

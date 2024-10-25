@@ -12,7 +12,15 @@ export interface ITestimonial {
 
 export const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/news', label: 'News' },
+  {
+    href: '/news',
+    label: 'News',
+    content: [
+      { order: 1, href: '/news', label: 'All news' },
+      { order: 2, href: '/news/spacex', label: 'SpaceX news' },
+      { order: 3, href: '/news/summaries', label: 'Weekly Summaries' },
+    ],
+  },
   {
     href: '/launches',
     label: 'Launches',
@@ -20,9 +28,15 @@ export const navLinks = [
       { order: 1, href: '/launches/upcoming', label: 'Upcoming launches' },
       { order: 2, href: '/launches/past', label: 'Past launches' },
       { order: 3, href: '/launches/upcoming/spacex', label: 'SpaceX launches' },
-      { order: 4, href: '/launches', label: 'All launches' },
+      {
+        order: 4,
+        href: '/launches/upcoming/starship',
+        label: 'Starship launches',
+      },
+      { order: 5, href: '/launches', label: 'All launches' },
     ],
   },
+  { href: '/events', label: 'Events' },
   { href: '/astronauts', label: 'Astronauts' },
   { href: '/starship', label: 'Starship' },
   // { href: "/calendar", label: "Calendar" },

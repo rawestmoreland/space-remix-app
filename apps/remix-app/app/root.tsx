@@ -16,6 +16,14 @@ import { LinksFunction } from '@remix-run/react/dist/routeModules';
 import Particles from './components/ui/particles';
 import HyperText from './components/ui/hyper-text';
 import NumberTicker from './components/ui/number-ticker';
+import {
+  PreventFlashOnWrongTheme,
+  Theme,
+  ThemeProvider,
+  useTheme,
+} from 'remix-themes';
+
+import clsx from 'clsx';
 
 export const links: LinksFunction = () => [
   {
@@ -40,37 +48,41 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function ErrorBoundary() {
+function ErrorContent() {
   const error = useRouteError();
+  const [theme] = useTheme();
 
-  if (isRouteErrorResponse(error)) {
-    if (error.status === 404) {
-      return (
-        <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
-          <NumberTicker className='text-3xl font-bold mb-2' value={404} />
-          <img
-            className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
-            src='/not-found.jpg'
-            alt='Page not found'
-          />
-          <HyperText
-            className='text-2xl font-bold w-full flex flex-wrap'
-            text='OOPS!'
-          />
-          <HyperText
-            className='text-2xl font-bold'
-            text='THIS PAGE IS LOST IN SPACE'
-          />
-          <Particles
-            className='absolute inset-0'
-            quantity={500}
-            ease={80}
-            color='#000000'
-            refresh
-          />
-        </div>
-      );
+  const ErrorDisplay = () => {
+    if (isRouteErrorResponse(error)) {
+      if (error.status === 404) {
+        return (
+          <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
+            <NumberTicker className='text-3xl font-bold mb-2' value={404} />
+            <img
+              className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
+              src='/not-found.jpg'
+              alt='Page not found'
+            />
+            <HyperText
+              className='text-2xl font-bold w-full flex flex-wrap'
+              text='OOPS!'
+            />
+            <HyperText
+              className='text-2xl font-bold'
+              text='THIS PAGE IS LOST IN SPACE'
+            />
+            <Particles
+              className='absolute inset-0'
+              quantity={500}
+              ease={80}
+              color='#FFFFFF'
+              refresh
+            />
+          </div>
+        );
+      }
     }
+    // Default error display for all other error types
     return (
       <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
         <NumberTicker className='text-3xl font-bold mb-2' value={500} />
@@ -96,68 +108,41 @@ export function ErrorBoundary() {
         />
       </div>
     );
-  } else if (error instanceof Error) {
-    return (
-      <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
-        <NumberTicker className='text-3xl font-bold mb-2' value={500} />
-        <img
-          className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
-          src='/error.jpg'
-          alt='Page not found'
-        />
-        <HyperText
-          className='text-2xl font-bold w-full flex flex-wrap'
-          text='OOPS!'
-        />
-        <HyperText
-          className='text-2xl font-bold'
-          text='SOMETHING HAS GONE WRONG'
-        />
-        <Particles
-          className='absolute inset-0'
-          quantity={500}
-          ease={80}
-          color='#000000'
-          refresh
-        />
-      </div>
-    );
-  } else {
-    return (
-      <div className='relative w-full flex flex-col items-center justify-center min-h-screen -mt-16'>
-        <NumberTicker className='text-3xl font-bold mb-2' value={500} />
-        <img
-          className='z-10 w-[200px] h-[200px] object-cover rounded-full md:h-[500px] md:w-[500px] max-w-xl'
-          src='/error.jpg'
-          alt='Page not found'
-        />
-        <HyperText
-          className='text-2xl font-bold w-full flex flex-wrap'
-          text='OOPS!'
-        />
-        <HyperText
-          className='text-2xl font-bold'
-          text='SOMETHING HAS GONE WRONG'
-        />
-        <Particles
-          className='absolute inset-0'
-          quantity={500}
-          ease={80}
-          color='#000000'
-          refresh
-        />
-      </div>
-    );
-  }
-}
+  };
 
-export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
+    <html lang='en' className={clsx(theme)}>
       <head>
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <Meta />
+        <PreventFlashOnWrongTheme ssrTheme={true} />
+        <Links />
+      </head>
+      <body>
+        <div className='flex min-h-screen flex-col'>
+          <Header throttled={false} />
+          <LoadingMask />
+          <ErrorDisplay />
+          <Footer />
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function AppContent() {
+  const [theme] = useTheme();
+
+  return (
+    <html lang='en' className={clsx(theme)}>
+      <head>
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <Meta />
+        <PreventFlashOnWrongTheme ssrTheme={true} />
         <Links />
         <script
           async
@@ -177,7 +162,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className='flex min-h-screen flex-col'>
           <Header throttled={false} />
           <LoadingMask />
-          {children}
+          <Outlet />
           <Footer />
         </div>
         <ScrollRestoration />
@@ -187,6 +172,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+export function ErrorBoundary() {
+  return (
+    <ThemeProvider specifiedTheme={Theme.DARK} themeAction='/action/set-theme'>
+      <ErrorContent />
+    </ThemeProvider>
+  );
+}
+
 export default function App() {
-  return <Outlet />;
+  return (
+    <ThemeProvider specifiedTheme={Theme.DARK} themeAction='/action/set-theme'>
+      <AppContent />
+    </ThemeProvider>
+  );
 }

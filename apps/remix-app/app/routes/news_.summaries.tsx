@@ -1,6 +1,7 @@
 import { prisma } from '~/db.server';
 import { json, Link, useLoaderData } from '@remix-run/react';
 import { NewsletterPost } from '@prisma/client';
+import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 
 export async function loader() {
   const posts = await prisma.newsletterPost.findMany({
@@ -12,7 +13,7 @@ export async function loader() {
   return json({ posts });
 }
 
-export default function Posts() {
+export default function Summaries() {
   const { posts } = useLoaderData<typeof loader>();
 
   // Parse date fields back into Date objects
@@ -25,6 +26,15 @@ export default function Posts() {
   return (
     <main className='flex-1'>
       <div className='mx-auto mb-8 w-full max-w-2xl px-4 md:px-0'>
+        <div className='my-4'>
+          <TypographyH1>Weekly News Summaries</TypographyH1>
+        </div>
+        <div>
+          <TypographyMuted>
+            Every week, with the help of AI, I summarize the most important news
+            in tech, finance, and business. Here are the latest summaries:
+          </TypographyMuted>
+        </div>
         <div className='flex flex-col gap-4 mt-8'>
           {parsedPosts.map((post: NewsletterPost, index: number) => (
             <div
@@ -32,7 +42,7 @@ export default function Posts() {
               className={`group ${index !== parsedPosts.length - 1} ? 'border-b-2' : ''`}
             >
               <Link
-                to={`/post/${post.slug}`}
+                to={`/summary/${post.slug}`}
                 className='flex flex-col gap-4 border-2 shadow-xl p-4 rounded-xl'
               >
                 <div className='flex flex-col gap-1'>

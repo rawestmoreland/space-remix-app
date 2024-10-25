@@ -1,97 +1,60 @@
 import axios, { isAxiosError, AxiosError } from 'axios';
 import { getCacheDuration, getCacheForURL } from '~/lib/redis';
 import { redis } from '~/redis.server';
+import { IAgency, IProgram, IUpdate } from '~/services/interfaces';
+import { ILaunchResult } from '~/services/launchService';
 import {
   checkRateLimit,
   updateRateLimitTracking,
 } from '~/services/rateLimitService';
 
-export interface ILaunchStatus {
-  id: number;
-  name: string;
-  description: string;
-  abbrev: string;
-}
-
-export interface ILaunchResponse {
+export interface IEventResponse {
   count: number;
   next: string;
   previous: string;
-  results: ILaunchResult[];
+  results: IEventResult[];
 }
 
-export interface IUpdate {
-  id: string;
-  comment: string;
-  profile_image: string;
-  created_by: string;
-  created_on: string;
-}
-
-export interface ILaunchResult {
+export interface IEventResult {
   id: string;
   name: string;
   next?: string;
   previous?: string;
-  program: { name: string }[];
-  rocket: {
-    configuration: {
-      name: string;
-      full_name: string;
-      manufacturer: {
-        name: string;
-      };
-      leo_capacity: number;
-      length: number;
-      diameter: number;
-    };
-  };
-  status: ILaunchStatus;
-  net: string;
-  launch_service_provider: {
-    name: string;
-    abbrev: string;
-  };
-  mission: {
-    name: string;
-    type: string;
-    description: string;
-    agencies: {
-      id: string;
-      name: string;
-    }[];
-  };
-  updates: IUpdate[];
-  webcast_live: boolean;
-  pad: {
-    name: string;
-    location: {
-      name: string;
-    };
-  };
-
   image: {
     image_url: string;
+    name: string;
   };
+  date: string;
+  slug: string;
+  type: {
+    id: number;
+    name: string;
+  };
+  location: string;
+  description: string;
+  updates: IUpdate[];
+  program: IProgram[];
+  agencies: IAgency[];
+  launches: ILaunchResult[];
 }
 
-export async function getLaunches(
+export async function getEvents(
   url: string
-): Promise<{ data: ILaunchResponse | null; error: string | null }> {
+): Promise<{ data: IEventResponse | null; error: string | null }> {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
     if (!rateLimit.canProceed) {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
-        return { data: cachedData as ILaunchResponse, error: null };
+        return { data: cachedData as IEventResponse, error: null };
       }
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
     const cachedData = await getCacheForURL(url);
     if (cachedData) {
-      return { data: cachedData as ILaunchResponse, error: null };
+      return { data: cachedData as IEventResponse, error: null };
     }
 
     const response = await axios.get(url);
@@ -120,7 +83,7 @@ export async function getLaunches(
   }
 }
 
-export async function getLaunchById(url: string) {
+export async function getEventById(url: string) {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
@@ -143,34 +106,6 @@ export async function getLaunchById(url: string) {
     // Update rate limit tracking
     await updateRateLimitTracking();
 
-    return { data: response.data, error: null };
-  } catch (error) {
-    if (isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      return {
-        data: null,
-        error:
-          axiosError.response?.data ||
-          axiosError.message ||
-          'An error occurred',
-      };
-    }
-    return { data: null, error: 'An error occurred' };
-  }
-}
-
-export async function getLaunchStatuses() {
-  const url = `${process.env.LL_BASE_URL}/config/launch_statuses`;
-  try {
-    const cachedData = await redis.get(url);
-
-    if (cachedData) {
-      return { data: cachedData, error: null };
-    }
-
-    const response = await axios.get(url);
-    await redis.set(url, JSON.stringify(response.data));
-    await redis.expire(url, 60 * 60 * 24 * 7); // 7 days
     return { data: response.data, error: null };
   } catch (error) {
     if (isAxiosError(error)) {

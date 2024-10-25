@@ -1,7 +1,7 @@
 import { useLoaderData, json } from '@remix-run/react';
 import { LivestreamCard } from '~/components/livestream-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { TypographyH1 } from '~/components/ui/typography';
+import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import { VehicleCard } from '~/components/vehicle-card';
 import {
   getStarshipDashboard,
@@ -33,7 +33,10 @@ export default function StarshipDashboard() {
         <div className='mb-4 mt-4'>
           <TypographyH1>Starship Dashboard</TypographyH1>
         </div>
-        <Tabs defaultValue='live-streams' className='w-full'>
+        <TypographyMuted>
+          The latest Starship updates, live streams, and vehicle information
+        </TypographyMuted>
+        <Tabs defaultValue='live-streams' className='w-full mt-8'>
           <TabsList className='grid w-full grid-cols-2'>
             <TabsTrigger value='live-streams'>Live Streams</TabsTrigger>
             <TabsTrigger value='vehicles'>Vehicles</TabsTrigger>

@@ -6,8 +6,13 @@ import { CalendarIcon, InfoIcon, MapPinIcon, RocketIcon } from 'lucide-react';
 import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Separator } from '~/components/ui/separator';
 import { cn } from '~/lib/utils';
+import { getUrlSession } from '~/sessions.server';
+import { LaunchBreadcrumbs } from '~/components/launches/launch-breadcrumbs';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
+  const session = await getUrlSession(request.headers.get('Cookie'));
+  const urlContext = session.get('urlContext');
+
   invariant(params.id, 'No launch id provided');
 
   const launch = await getLaunchById(
@@ -18,39 +23,45 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  return json({ launch: launch.data as ILaunchResult });
+  return json({ launch: launch.data as ILaunchResult, urlContext });
 }
 
 export default function LaunchInfo() {
-  const { launch } = useLoaderData<typeof loader>();
+  const { launch, urlContext } = useLoaderData<typeof loader>();
 
   return (
     <main className='container max-w-3xl mx-auto px-4 py-8'>
+      <LaunchBreadcrumbs
+        launchName={launch.name}
+        urlContext={urlContext}
+        className='mb-8'
+      />
+
       <h1 className='text-3xl font-bold mb-6'>{launch.name}</h1>
 
       <div className='grid md:grid-cols-2 gap-8'>
         <AspectRatio ratio={4 / 3} className='bg-muted shadow-xl rounded-xl'>
           <img
             src={launch.image?.image_url ?? '/placeholder-rocket.jpg'}
-            alt='Soyuz 2.1b | Kosmos 2570 (Lotos-S1 #8)'
+            alt={launch.name}
             className='rounded-xl object-cover h-full w-full shadow-xl'
           />
         </AspectRatio>
 
-        <div className='space-y-4'>
+        <div className='bg-card p-4 rounded-lg shadow-lg border border-muted space-y-4'>
           <div className='flex items-start space-x-2'>
-            <CalendarIcon className='text-primary h-4 w-4' />
+            <CalendarIcon className='text-primary h-4 w-4 mt-1' />
             <span>Launch Date: {new Date(launch.net).toUTCString()}</span>
           </div>
           <div className='flex items-start space-x-2'>
-            <MapPinIcon className='text-green-500 h-4 w-4' />
+            <MapPinIcon className='text-green-500 h-4 w-4 mt-1' />
             <span>
               Launch Site:{' '}
               {launch.pad?.location?.name ?? 'No pad information available'}
             </span>
           </div>
           <div className='flex items-start space-x-2'>
-            <RocketIcon className='text-destructive h-4 w-4' />
+            <RocketIcon className='text-destructive h-4 w-4 mt-1' />
             <span>
               Launch Vehicle:{' '}
               {launch.rocket?.configuration?.full_name ??
@@ -58,7 +69,7 @@ export default function LaunchInfo() {
             </span>
           </div>
           <div className='flex items-start space-x-2'>
-            <InfoIcon className='text-purple-500 h-4 w-4' />
+            <InfoIcon className='text-purple-500 h-4 w-4 mt-1' />
             <span>
               Status: {launch.status?.name ?? 'No launch status available'}
             </span>
@@ -67,7 +78,7 @@ export default function LaunchInfo() {
       </div>
 
       <div className='mt-8 space-y-6'>
-        <section>
+        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>Mission Details</h2>
           <p>
             {launch.mission.description ||
@@ -75,7 +86,7 @@ export default function LaunchInfo() {
           </p>
         </section>
 
-        <section>
+        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>
             Launch Service Provider
           </h2>
@@ -86,7 +97,7 @@ export default function LaunchInfo() {
           </p>
         </section>
 
-        <section>
+        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>Rocket Information</h2>
           <ul className='list-disc list-inside space-y-2'>
             <li>Configuration: {launch.rocket.configuration.name}</li>
@@ -102,14 +113,14 @@ export default function LaunchInfo() {
           </ul>
         </section>
 
-        <section>
+        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>Launch Pad</h2>
           <p>
             {launch.pad.location.name} {launch.pad.name}
           </p>
         </section>
 
-        <section>
+        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>Updates</h2>
           <ul className='space-y-2'>
             {launch.updates

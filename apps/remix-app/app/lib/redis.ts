@@ -1,4 +1,5 @@
 import { redis } from '~/redis.server';
+import { IEventResponse } from '~/services/eventsService';
 import { ILaunchResponse } from '~/services/launchService';
 
 export const CACHE_DURATIONS = {
@@ -25,9 +26,9 @@ export function getCacheDuration(url: string) {
   return CACHE_DURATIONS.DEFAULT;
 }
 
-export async function getCacheForURL(
-  url: string
-): Promise<ILaunchResponse | null> {
+type CacheableResponse = ILaunchResponse | IEventResponse | null;
+
+export async function getCacheForURL(url: string): Promise<CacheableResponse> {
   if (process.env.NODE_ENV === 'development') return null;
 
   try {

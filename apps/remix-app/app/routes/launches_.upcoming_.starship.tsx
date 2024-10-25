@@ -25,7 +25,7 @@ import { commitUrlSession, getUrlSession } from '~/sessions.server';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
   const session = await getUrlSession(request.headers.get('Cookie'));
-  session.set('urlContext', request.url);
+  session.set('launchContext', request.url);
 
   const { env } = process;
   const queryURL = new URL(`${env.LL_BASE_URL}/launches/upcoming`);
@@ -36,10 +36,11 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
-  queryURL.searchParams.append('search', 'spacex');
+  queryURL.searchParams.append('rocket__configuration__name', 'Starship');
   queryURL.searchParams.append('ordering', 'net');
 
   const { data, error } = await getLaunches(queryURL.toString());
+  console.log({ data, error });
   if (error) {
     throw json({ error }, { status: 500 });
   }
@@ -49,7 +50,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   );
 }
 
-export default function UpcomingSpaceXLaunches() {
+export default function UpcomingStarshipLaunches() {
   const { launches } = useLoaderData<typeof loader>();
 
   const [items, setItems] = useState<ILaunchResult[]>(launches?.results || []);
@@ -96,7 +97,7 @@ export default function UpcomingSpaceXLaunches() {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
           fetcher.load(
-            `/launches/upcoming/spacex?offset=${offset}&limit=${limit}`
+            `/launches/upcoming/starship?offset=${offset}&limit=${limit}`
           );
         }
       },
@@ -114,11 +115,13 @@ export default function UpcomingSpaceXLaunches() {
     <main className='flex-1'>
       <div className='mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
         <div className='my-4'>
-          <TypographyH1>Upcoming SpaceX Launches</TypographyH1>
+          <TypographyH1>Upcoming Starship Launches</TypographyH1>
         </div>
-        <TypographyMuted>
-          Upcoming SpaceX launches sorted by NET date
-        </TypographyMuted>
+        <div>
+          <TypographyMuted>
+            SpaceX Starship launches that are scheduled to happen soon.
+          </TypographyMuted>
+        </div>
         {items.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>

@@ -97,7 +97,7 @@ export default function Index() {
 
   return (
     <main className='flex-1'>
-      <section className='w-full bg-slate-50 py-12 md:py-24 lg:py-32 xl:py-48'>
+      <section className='w-full py-12 md:py-24 lg:py-32 xl:py-48'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
           <div className='overflow-hidden flex flex-col items-center space-y-4 text-center'>
             <div className='space-y-2'>
@@ -107,7 +107,7 @@ export default function Index() {
               <h1 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none'>
                 Your Weekly Dose of Space Exploration
               </h1>
-              <p className='mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl'>
+              <p className='mx-auto max-w-[700px] text-muted-foreground md:text-xl'>
                 Stay informed about upcoming rocket launches, space missions,
                 and industry news with our curated weekly newsletter.
               </p>
@@ -146,7 +146,7 @@ export default function Index() {
                   }
                 />
               </fetcher.Form>
-              <p className='text-xs text-gray-500 dark:text-gray-400'>
+              <p className='text-xs text-muted-foreground'>
                 Join our growing list of space enthusiasts. Unsubscribe at any
                 time.
               </p>

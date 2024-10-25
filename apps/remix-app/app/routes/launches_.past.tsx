@@ -15,14 +15,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog';
-import { TypographyH1 } from '~/components/ui/typography';
+import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getLaunches,
   ILaunchResponse,
   ILaunchResult,
 } from '~/services/launchService';
+import { commitUrlSession, getUrlSession } from '~/sessions.server';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
+  const session = await getUrlSession(request.headers.get('Cookie'));
+  session.set('urlContext', request.url);
+
   const { env } = process;
   const queryURL = new URL(`${env.LL_BASE_URL}/launches/previous`);
   const url = new URL(request.url);
@@ -38,7 +42,12 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   if (error) {
     throw json({ error }, { status: 500 });
   }
-  return json({ launches: data as ILaunchResponse });
+  return json(
+    {
+      launches: data as ILaunchResponse,
+    },
+    { headers: { 'Set-Cookie': await commitUrlSession(session) } }
+  );
 }
 
 export default function PastLaunches() {
@@ -106,9 +115,10 @@ export default function PastLaunches() {
         <div className='my-4'>
           <TypographyH1>Past Launches</TypographyH1>
         </div>
+        <TypographyMuted>Launches that have already occurred</TypographyMuted>
         {items?.length > 0 ? (
           <>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>
               {items.map((launch: ILaunchResult) => (
                 <Dialog
                   key={launch.id}
