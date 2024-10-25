@@ -191,7 +191,7 @@ function generateHTML(
             <div>
               <div style="display: flex; flex-direction: column; gap: 16px;">
                 <h3 style="font-size: 18px; color: blue; text-decoration: underline; font-weight: 500;">
-                  <a href="${article.link}">${article.title}</a>
+                  <a style="color: cornflowerblue;" href="${article.link}">${article.title}</a>
                 </h3>
                 <p>${article.summary}</p>
               </div>
