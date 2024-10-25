@@ -13,8 +13,12 @@ import {
   getLaunchStatuses,
   ILaunchResponse,
 } from '~/services/launchService';
+import { commitUrlSession, getUrlSession } from '~/sessions.server';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
+  const session = await getUrlSession(request.headers.get('Cookie'));
+  session.set('urlContext', request.url);
+
   const { env } = process;
   const queryURL = new URL(`${env.LL_BASE_URL}/launches`);
   const url = new URL(request.url);
@@ -45,10 +49,15 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   if (launchesResponse.error) {
     throw json({ error: launchesResponse.error }, { status: 500 });
   }
-  return json({
-    launches: launchesResponse.data as ILaunchResponse,
-    statuses: statusesResponse.data,
-  });
+  return json(
+    {
+      launches: launchesResponse.data as ILaunchResponse,
+      statuses: statusesResponse.data,
+    },
+    {
+      headers: { 'Set-Cookie': await commitUrlSession(session) },
+    }
+  );
 }
 
 export default function Launches() {

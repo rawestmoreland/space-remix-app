@@ -13,7 +13,10 @@ export const columns: ColumnDef<ILaunchResult>[] = [
       const name: string = row.getValue('name') ?? 'N/A';
       const id: string = row.original.id;
       return (
-        <Link to={`/launch/${id}`} className='text-blue-500'>
+        <Link
+          to={`/launch/${id}`}
+          className='text-muted-foreground underline-offset-2 hover:underline'
+        >
           {name}
         </Link>
       );
