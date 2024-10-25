@@ -38,7 +38,7 @@ export function NavMenu({ throttled }: { throttled: boolean }) {
                   <NavLink
                     to={link.href}
                     className={({ isActive }) =>
-                      `${isActive ? 'text-primary underline' : ''}`
+                      `${isActive ? 'text-muted-foreground underline' : ''}`
                     }
                   >
                     {link.label}
