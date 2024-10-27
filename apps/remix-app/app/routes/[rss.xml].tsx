@@ -61,6 +61,7 @@ export function generateRss({
         <ttl>60</ttl>
         <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />
         <lastBuildDate>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toUTCString().replace('GMT', '+0000')}</lastBuildDate>
+        <pubDate>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toUTCString().replace('GMT', '+0000')}</pubDate>
         <atom:updated>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:updated>
         <atom:published>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:published>`;
 
