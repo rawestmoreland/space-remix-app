@@ -6,4 +6,7 @@ export const emojiMap = {
   'Upcoming Space Events': '🌌',
   'Earth from Above': '🌍',
   'Human Spaceflight Milestones': '👩‍🚀',
+  'Moon Exploration Updates': '🌕',
+  'Cosmic Discoveries': '🌌',
+  'Space Economy & Ventures': '💰',
 };
