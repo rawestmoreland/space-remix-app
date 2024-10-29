@@ -76,7 +76,7 @@ export function generateRss({
             <description>${escapeXml(post.description)}</description>
             <pubDate>${escapeXml(post.pubDate)}</pubDate>
             <atom:published>${new Date(post.pubDate).toISOString()}</atom:published>
-            <link>https://launchlist.space/post/${escapeXml(post.slug)}</link>
+            <link>https://launchlist.space/summary/${escapeXml(post.slug)}</link>
             <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
             <content:encoded><![CDATA[${post.content}]]></content:encoded>
             <guid isPermaLink="false">${escapeXml(post.link)}</guid>
