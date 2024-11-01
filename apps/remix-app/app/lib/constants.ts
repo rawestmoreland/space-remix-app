@@ -45,7 +45,7 @@ export const navLinks = [
 export const flattenedNavLinks = (links: INavLink[]) => {
   return links.reduce((acc: INavLink[], link: INavLink) => {
     if (link.content) {
-      return [...acc, { href: link.href, label: link.label }, ...link.content];
+      return [...acc, ...link.content];
     }
     return [...acc, link];
   }, []);

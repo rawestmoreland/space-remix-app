@@ -121,7 +121,7 @@ function ErrorContent() {
       </head>
       <body>
         <div className='flex min-h-screen flex-col'>
-          <Header throttled={false} />
+          <Header />
           <LoadingMask />
           <ErrorDisplay />
           <Footer />
@@ -160,7 +160,7 @@ function AppContent() {
       </head>
       <body>
         <div className='flex min-h-screen flex-col'>
-          <Header throttled={false} />
+          <Header />
           <LoadingMask />
           <Outlet />
           <Footer />

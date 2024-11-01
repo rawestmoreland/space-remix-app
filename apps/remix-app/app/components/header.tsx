@@ -7,7 +7,7 @@ import { Button } from './ui/button';
 import { navLinks, flattenedNavLinks } from '~/lib/constants';
 import { useState } from 'react';
 
-export function Header({ throttled }: { throttled: boolean }) {
+export function Header() {
   const mobileLinks = flattenedNavLinks(navLinks);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,13 +32,13 @@ export function Header({ throttled }: { throttled: boolean }) {
           <RocketIcon className='h-6 w-6 text-primary' />
           <span className='ml-2 text-lg font-bold'>Launch List</span>
         </Link>
-        <NavMenu throttled={throttled} />
+        <NavMenu />
       </nav>
       <Sheet
         open={mobileMenuOpen}
         onOpenChange={() => setMobileMenuOpen(false)}
       >
-        <SheetContent side='left'>
+        <SheetContent side='left' className='overflow-y-auto'>
           <nav className='grid gap-6 text-lg font-medium'>
             {mobileLinks.map((link) => {
               return (

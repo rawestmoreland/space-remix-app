@@ -60,10 +60,15 @@ export function generateRss({
         <language>en-us</language>
         <ttl>60</ttl>
         <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />
+        <generator>LaunchList RSS Feed</generator>
+        <docs>https://www.rssboard.org/rss-specification</docs>
         <lastBuildDate>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toUTCString().replace('GMT', '+0000')}</lastBuildDate>
         <pubDate>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toUTCString().replace('GMT', '+0000')}</pubDate>
         <atom:updated>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:updated>
-        <atom:published>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:published>`;
+        <atom:published>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toISOString()}</atom:published>
+        <category>Space</category>
+        <category>Astronomy</category>
+        <category>Science</category>`;
 
   const rssBody = posts
     .sort(
@@ -76,10 +81,14 @@ export function generateRss({
             <description>${escapeXml(post.description)}</description>
             <pubDate>${escapeXml(post.pubDate)}</pubDate>
             <atom:published>${new Date(post.pubDate).toISOString()}</atom:published>
+            <atom:updated>${new Date(post.pubDate).toISOString()}</atom:updated>
             <link>https://launchlist.space/summary/${escapeXml(post.slug)}</link>
             <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
             <content:encoded><![CDATA[${post.content}]]></content:encoded>
             <guid isPermaLink="false">${escapeXml(post.link)}</guid>
+            <category>Space</category>
+            <source url="https://launchlist.space">The Launch List</source>
+            <comments>https://launchlist.space/summary/${escapeXml(post.slug)}#comments</comments>
           </item>`
     )
     .join('\n');
