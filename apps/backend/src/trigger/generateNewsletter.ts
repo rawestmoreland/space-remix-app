@@ -16,13 +16,13 @@ export const checkAIBatches = schedules.task({
     const articleSummaries = await prisma.aIArticleSummary.findMany({
       where: {
         createdAt: {
-          gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+          gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), //
         },
       },
       include: {
         article: true,
       },
-      take: 10,
+      take: 20,
     });
 
     // If there are no article summaries, return
