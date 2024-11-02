@@ -59,7 +59,7 @@ export function generateRss({
         <link>${escapeXml(link)}</link>
         <language>en-us</language>
         <ttl>60</ttl>
-        <atom:link href="https://launchlist.space/rss.xml" rel="self" type="application/xml" />
+        <atom:link href="https://launchlist.space/rss.xml" rel="self" />
         <generator>LaunchList RSS Feed</generator>
         <docs>https://www.rssboard.org/rss-specification</docs>
         <lastBuildDate>${new Date(posts.sort((a: { pubDate: string }, b: { pubDate: string }) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())[0].pubDate).toUTCString().replace('GMT', '+0000')}</lastBuildDate>
