@@ -158,7 +158,7 @@ export default function Index() {
                 <ArticleCard
                   key={article.id}
                   url={article.url}
-                  img={article.image_url}
+                  img={article?.image_url ?? '/placeholder-rocket.jpg'}
                   title={article.title}
                   summary={article.summary}
                   outlet={article.news_site}
@@ -172,7 +172,7 @@ export default function Index() {
                 <ArticleCard
                   key={launch.id}
                   url='#'
-                  img={launch.image.image_url ?? '/placeholder-rocket.jpg'}
+                  img={launch?.image?.image_url ?? '/placeholder-rocket.jpg'}
                   title={launch.mission?.name ?? 'Unknown'}
                   summary={launch.mission?.description ?? 'No description'}
                   outlet={launch.program?.[0]?.name ?? 'Unknown agency'}
