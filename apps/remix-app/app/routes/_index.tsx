@@ -44,7 +44,7 @@ export const meta: MetaFunction = () => {
 export const loader = async () => {
   try {
     const response = await axios.get(
-      `https://api.spaceflightnewsapi.net/v4/articles?limit=7&ordering=published`
+      `https://api.spaceflightnewsapi.net/v4/articles?limit=7&ordering=published_at`
     );
     const { data, error } = await getLaunches(
       `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
