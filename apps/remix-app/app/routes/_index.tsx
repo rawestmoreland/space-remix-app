@@ -152,7 +152,7 @@ export default function Index() {
               </p>
             </div>
           </div>
-          {!!articles.length && (
+          {!!articles?.length && (
             <Marquee pauseOnHover className='[--duration:40s] mt-8'>
               {articles.map((article: IArticle) => (
                 <ArticleCard
