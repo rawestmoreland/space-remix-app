@@ -15,7 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog';
-import { TypographyH1 } from '~/components/ui/typography';
+import { Label } from '~/components/ui/label';
+import { Switch } from '~/components/ui/switch';
+import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import { getAstronauts, IAstronaut } from '~/services/astronautService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
@@ -45,9 +47,24 @@ export default function Astronauts() {
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(astronauts.results.length);
   const [hasMore, setHasMore] = useState(astronauts.next !== null);
+  const [usaFilter, setUsaFilter] = useState(false);
 
   const fetcher = useFetcher<typeof loader>();
   const loaderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (usaFilter) {
+      setItems(
+        items.filter((astronaut: IAstronaut) =>
+          astronaut.nationality.some((nat) =>
+            nat.name.toLowerCase().includes('united states')
+          )
+        )
+      );
+    } else {
+      setItems(astronauts.results);
+    }
+  }, [usaFilter, astronauts]);
 
   useEffect(() => {
     if (fetcher.data) {
@@ -59,6 +76,13 @@ export default function Astronauts() {
               (prevItem: IAstronaut) => prevItem.id === newItem.id
             )
         );
+        if (usaFilter) {
+          return newItems.filter((astronaut: IAstronaut) =>
+            astronaut.nationality.some((nat) =>
+              nat.name.toLowerCase().includes('united states')
+            )
+          );
+        }
         return [...prevItems, ...uniqueNewItems];
       });
       if (!fetcher.data.astronauts?.next === null) {
@@ -97,9 +121,20 @@ export default function Astronauts() {
 
   return (
     <main className='flex-1'>
-      <div className='mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
+      <div className='flex flex-col gap-2 mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
         <div className='my-4'>
           <TypographyH1>Astronauts</TypographyH1>
+          <TypographyMuted>
+            Sorted by time in space, most time in space first.
+          </TypographyMuted>
+        </div>
+        <div className='flex items-center space-x-2'>
+          <Switch
+            id='usa-filter'
+            checked={usaFilter}
+            onCheckedChange={setUsaFilter}
+          />
+          <Label htmlFor='usa-filter'>Display only American Astronauts</Label>
         </div>
         {items?.length > 0 ? (
           <>

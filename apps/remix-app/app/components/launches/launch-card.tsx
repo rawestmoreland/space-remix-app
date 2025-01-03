@@ -20,7 +20,7 @@ export function LaunchCard({ launch }: { launch: ILaunchResult }) {
         <div className='mb-2 flex items-center'>
           <RocketIcon className='mr-2 h-4 w-4 text-muted-foreground' />
           <TypographyMuted>
-            {formatDate(launch.net)} at {formatTime(launch.net)}
+            {formatDate(launch.net)} at {formatTime({ dateString: launch.net })}
           </TypographyMuted>
         </div>
         <span className='line-clamp-6'>

@@ -40,7 +40,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   queryURL.searchParams.append('ordering', 'net');
 
   const { data, error } = await getLaunches(queryURL.toString());
-  console.log({ data, error });
+
   if (error) {
     throw json({ error }, { status: 500 });
   }

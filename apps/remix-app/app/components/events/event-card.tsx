@@ -20,7 +20,7 @@ export function EventCard({ event }: { event: IEventResult }) {
         <div className='mb-2 flex items-center'>
           <RocketIcon className='mr-2 h-4 w-4 text-muted-foreground' />
           <TypographyMuted>
-            {formatDate(event.date)} at {formatTime(event.date)}
+            {formatDate(event.date)} at {formatTime({ dateString: event.date })}
           </TypographyMuted>
         </div>
         <span className='line-clamp-6'>
