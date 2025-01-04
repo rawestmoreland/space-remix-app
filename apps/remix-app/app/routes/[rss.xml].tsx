@@ -125,8 +125,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     })),
   });
 
-  // Generate ETag based on content
-  const etag = Buffer.from(feed).toString('base64').substring(0, 27);
+  // Generate ETag based on content and latest post date
+  const latestPostDate =
+    posts.length > 0
+      ? new Date(posts[0].pubDate ?? new Date()).getTime().toString()
+      : new Date().getTime().toString();
+  const etag = `"${Buffer.from(latestPostDate).toString('base64')}"`;
 
   // Check if client has matching ETag
   const ifNoneMatch = request.headers.get('if-none-match');
@@ -137,11 +141,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   return new Response(feed, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 'no-cache, must-revalidate, max-age=0',
+      'Cache-Control':
+        'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Surrogate-Control': 'max-age=0, s-maxage=0',
       Pragma: 'no-cache',
       Expires: '0',
       ETag: etag,
       'Last-Modified': new Date().toUTCString(),
+      Vary: '*',
     },
   });
 };
