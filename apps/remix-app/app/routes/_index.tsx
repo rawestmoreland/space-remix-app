@@ -46,6 +46,11 @@ export const loader = async () => {
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+    const BASE_URL =
+      process.env.NODE_ENV === 'production'
+        ? 'https://launchlist.space/api'
+        : 'http://localhost:5173/api';
+
     const [
       articlesResponse,
       launchesResponse,
@@ -65,7 +70,7 @@ export const loader = async () => {
       getAstronauts(
         `${process.env.LL_BASE_URL}/astronauts?in_space=true&is_human=true`
       ),
-      fetch('http://localhost:5173/api/iss-location').then((res) => res.json()),
+      fetch(`${BASE_URL}/iss-location`).then((res) => res.json()),
     ]);
 
     return json({
