@@ -43,10 +43,19 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   try {
-    const today = new Date();
-    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const today = new Date().toISOString();
 
-    console.log(today.toISOString(), nextWeek.toISOString());
+    // Get upcoming Sunday at 11:59 PM
+    const now = new Date();
+    const daysUntilSunday = 7 - now.getDay();
+    const nextSunday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday),
+      23, // Hours (23 = 11 PM)
+      59 // Minutes
+    );
+    const upcomingSunday = nextSunday.toISOString();
 
     const BASE_URL =
       process.env.NODE_ENV === 'production'
@@ -67,7 +76,7 @@ export const loader = async () => {
         `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
       ),
       getLaunches(
-        `${process.env.LL_BASE_URL}/launches/upcoming?net_gte=${today.toISOString()}&net_lte=${nextWeek.toISOString()}`
+        `${process.env.LL_BASE_URL}/launches/upcoming?net_gte=${today}&net_lte=${upcomingSunday}`
       ),
       getAstronauts(
         `${process.env.LL_BASE_URL}/astronauts?in_space=true&is_human=true`
