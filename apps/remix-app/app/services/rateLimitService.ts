@@ -7,7 +7,7 @@ interface RateLimitStatus {
 
 export async function checkRateLimit(): Promise<RateLimitStatus> {
   if (process.env.NODE_ENV === 'development') {
-    return { canProceed: true, remainingCalls: 15 };
+    return { canProceed: true, remainingCalls: 210 };
   }
 
   const key = 'api_calls_count';
@@ -19,18 +19,18 @@ export async function checkRateLimit(): Promise<RateLimitStatus> {
       // If no count exists, start fresh with the time window
       await redis.set(key, '0');
       await redis.expire(key, timeWindow);
-      return { canProceed: true, remainingCalls: 15 };
+      return { canProceed: true, remainingCalls: 210 };
     }
 
     const callCount = parseInt(count.toString() || '0', 10);
-    if (callCount >= 15) {
+    if (callCount >= 210) {
       // Free tier limit
       return { canProceed: false, remainingCalls: 0 };
     }
 
     return {
       canProceed: true,
-      remainingCalls: 15 - callCount,
+      remainingCalls: 210 - callCount,
     };
   } catch (error) {
     console.error('Rate limit check error:', error);
