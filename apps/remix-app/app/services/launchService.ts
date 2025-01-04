@@ -1,5 +1,6 @@
-import axios, { isAxiosError, AxiosError } from 'axios';
+import { isAxiosError, AxiosError } from 'axios';
 import { getCacheDuration, getCacheForURL } from '~/lib/redis';
+import { launchListRequest } from '~/lib/utils';
 import { redis } from '~/redis.server';
 import {
   checkRateLimit,
@@ -94,7 +95,7 @@ export async function getLaunches(
       return { data: cachedData as ILaunchResponse, error: null };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -132,7 +133,7 @@ export async function getLaunchById(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -168,7 +169,7 @@ export async function getLaunchStatuses() {
       return { data: cachedData, error: null };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
     await redis.set(url, JSON.stringify(response.data));
     await redis.expire(url, 60 * 60 * 24 * 7); // 7 days
     return { data: response.data, error: null };

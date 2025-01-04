@@ -1,4 +1,4 @@
-import axios, { isAxiosError, AxiosError } from 'axios';
+import { isAxiosError, AxiosError } from 'axios';
 import { getCacheDuration, getCacheForURL } from '~/lib/redis';
 import { redis } from '~/redis.server';
 import { IAgency, IProgram, IUpdate } from '~/services/interfaces';
@@ -7,7 +7,7 @@ import {
   checkRateLimit,
   updateRateLimitTracking,
 } from '~/services/rateLimitService';
-
+import { launchListRequest } from '~/lib/utils';
 export interface IEventResponse {
   count: number;
   next: string;
@@ -57,7 +57,7 @@ export async function getEvents(
       return { data: cachedData as IEventResponse, error: null };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -95,7 +95,7 @@ export async function getEventById(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);

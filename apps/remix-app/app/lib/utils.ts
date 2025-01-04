@@ -1,8 +1,21 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import axios from 'axios';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export async function launchListRequest(url: string) {
+  const response = await axios.get(url, {
+    headers:
+      process.env.NODE_ENV === 'production'
+        ? {
+            Authorization: `Token: ${process.env.LL_API_KEY}`,
+          }
+        : undefined,
+  });
+  return response;
 }
 
 export function formatDate(dateString: string) {

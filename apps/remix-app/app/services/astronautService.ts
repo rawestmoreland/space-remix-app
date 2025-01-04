@@ -1,5 +1,6 @@
-import axios, { isAxiosError, AxiosError } from 'axios';
+import { isAxiosError, AxiosError } from 'axios';
 import { getCacheDuration, getCacheForURL } from '~/lib/redis';
+import { launchListRequest } from '~/lib/utils';
 import { redis } from '~/redis.server';
 import {
   checkRateLimit,
@@ -44,7 +45,7 @@ export async function getAstronauts(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     // Get cache duration
     const cacheDuration = getCacheDuration(url);
@@ -82,7 +83,7 @@ export async function getAstronautStatuses(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await axios.get(url);
+    const response = await launchListRequest(url);
 
     const cacheDuration = getCacheDuration(url);
     if (process.env.NODE_ENV === 'production') {
