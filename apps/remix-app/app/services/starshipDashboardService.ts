@@ -46,6 +46,7 @@ interface IVehicleLauncherConfig {
 
 interface IImage {
   image_url: string;
+  license: { name: string; link: string };
 }
 
 export interface IStarshipResponse {

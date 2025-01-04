@@ -73,6 +73,7 @@ export interface ILaunchResult {
 
   image: {
     image_url: string;
+    license: { name: string; link: string };
   };
 }
 

@@ -27,10 +27,20 @@ export function EventCard({ event }: { event: IEventResult }) {
           {event.description || `We have no details for this mission.`}
         </span>
       </CardContent>
-      <CardFooter className='bg-background pt-4'>
+      <CardFooter className='bg-background flex flex-col gap-2 pt-4 items-start'>
         <Badge className='line-clamp-1' variant='default'>
           {event.type.name}
         </Badge>
+        {event.image?.license && (
+          <a
+            href={event.image.license.link}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-xs text-muted-foreground hover:underline'
+          >
+            Image: {event.image.license.name}
+          </a>
+        )}
       </CardFooter>
     </Card>
   );

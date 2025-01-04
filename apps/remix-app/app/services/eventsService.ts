@@ -23,6 +23,7 @@ export interface IEventResult {
   image: {
     image_url: string;
     name: string;
+    license: { name: string; link: string };
   };
   date: string;
   slug: string;

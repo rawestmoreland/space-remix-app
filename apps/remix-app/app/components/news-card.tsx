@@ -32,7 +32,7 @@ export function NewsCard({ article }: { article: IArticle }) {
           </div>
           <p className='line-clamp-3 text-sm'>{article.summary}</p>
         </CardContent>
-        <CardFooter className='z-10 bg-background pt-4'>
+        <CardFooter className='z-10 bg-background pt-4 flex flex-col items-start gap-2'>
           <Badge variant='default'>{article.news_site}</Badge>
         </CardFooter>
       </Card>

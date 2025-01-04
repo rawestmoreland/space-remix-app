@@ -20,6 +20,8 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
     return 'default';
   }, [astronaut.status.name]);
 
+  console.log(astronaut.image);
+
   return (
     <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
       <div className='relative h-48 overflow-hidden bg-muted'>
@@ -51,10 +53,20 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
             `We have no details for this mission.`}
         </span> */}
       </CardContent>
-      <CardFooter className='bg-background pt-4'>
+      <CardFooter className='bg-background flex flex-col gap-2 pt-4 items-start'>
         <Badge className='line-clamp-1' variant='default'>
           {astronaut.agency?.name ?? 'Unknown Agency'}
         </Badge>
+        {astronaut.image?.license && (
+          <a
+            href={astronaut.image.license.link}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-xs text-muted-foreground hover:underline'
+          >
+            Image: {astronaut.image.license.name}
+          </a>
+        )}
       </CardFooter>
     </Card>
   );

@@ -17,7 +17,7 @@ export interface IAstronaut {
   nationality: { name: string }[];
   date_of_birth: string;
   bio: string;
-  image: { image_url: string };
+  image: { image_url: string; license: { name: string; link: string } };
   time_in_space: string;
   flights_count: number;
   landings_count: number;
