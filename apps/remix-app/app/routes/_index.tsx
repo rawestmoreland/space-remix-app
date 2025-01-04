@@ -46,6 +46,8 @@ export const loader = async () => {
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+    console.log(today.toISOString(), nextWeek.toISOString());
+
     const BASE_URL =
       process.env.NODE_ENV === 'production'
         ? 'https://launchlist.space/api'
@@ -264,8 +266,8 @@ export default function Index() {
               />
               <SpaceStat
                 to='/launches/upcoming'
-                title='Launches this Week'
-                value={launchesThisWeek?.toString() ?? 'Unknown'}
+                title='Launches Remaining this Week'
+                value={launchesThisWeek?.toString() ?? '0'}
                 className='transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm rounded-xl border border-slate-200'
               />
               <SpaceStat
