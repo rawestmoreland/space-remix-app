@@ -41,7 +41,8 @@ export const navLinks = [
     href: '/astronauts',
     label: 'Astronauts',
     content: [
-      { order: 1, href: '/astronauts/in-space', label: 'In Space Now' },
+      { order: 1, href: '/astronauts', label: 'All astronauts' },
+      { order: 2, href: '/astronauts/in-space', label: 'In Space Now' },
     ],
   },
   { href: '/starship', label: 'Starship' },
