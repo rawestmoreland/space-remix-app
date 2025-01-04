@@ -11,6 +11,7 @@ export interface IAstronaut {
   name: string;
   age: number;
   status: { name: string };
+  in_space: boolean;
   agency: { name: string; abbrev: string };
   nationality: { name: string }[];
   date_of_birth: string;
@@ -26,11 +27,16 @@ export interface IAstronaut {
   social_media_links: { social_media: { name: string }; url: string }[];
 }
 
+export interface IAstronautStatus {
+  id: number;
+  name: string;
+}
+
 export async function getAstronauts(url: string) {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
-    if (!rateLimit.canProceed) {
+    if (!rateLimit.canProceed && process.env.NODE_ENV === 'production') {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
         return { data: cachedData, error: null };
@@ -43,11 +49,50 @@ export async function getAstronauts(url: string) {
     // Get cache duration
     const cacheDuration = getCacheDuration(url);
 
-    await redis.set(url, JSON.stringify(response.data));
-    await redis.expire(url, cacheDuration);
+    if (process.env.NODE_ENV === 'production') {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
 
     // Update rate limit tracking
-    await updateRateLimitTracking();
+    if (process.env.NODE_ENV === 'production') {
+      await updateRateLimitTracking();
+    }
+
+    return { data: response.data, error: null };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      return {
+        data: null,
+        error:
+          axiosError.response?.data ||
+          axiosError.message ||
+          'An error occurred',
+      };
+    }
+    return { data: null, error: 'An error occurred' };
+  }
+}
+
+export async function getAstronautStatuses(url: string) {
+  try {
+    const rateLimit = await checkRateLimit();
+    if (!rateLimit.canProceed && process.env.NODE_ENV === 'production') {
+      return { data: null, error: 'Rate limit exceeded. Try again later.' };
+    }
+
+    const response = await axios.get(url);
+
+    const cacheDuration = getCacheDuration(url);
+    if (process.env.NODE_ENV === 'production') {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      await updateRateLimitTracking();
+    }
 
     return { data: response.data, error: null };
   } catch (error) {

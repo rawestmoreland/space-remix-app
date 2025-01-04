@@ -45,6 +45,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
+  queryURL.searchParams.append('in_space', 'true'); // Add this parameter
   if (statusId) {
     queryURL.searchParams.append('status_ids', statusId);
   }
@@ -62,7 +63,7 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
   return json({ astronauts: data, statuses: statuses });
 }
 
-export default function Astronauts() {
+export default function AstronautsInSpace() {
   const { astronauts, statuses } = useLoaderData<typeof loader>();
 
   const [items, setItems] = useState<IAstronaut[]>(astronauts.results);
@@ -108,7 +109,7 @@ export default function Astronauts() {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
           fetcher.load(
-            `/astronauts?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
+            `/astronauts/in-space?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
           );
         }
       },
@@ -129,7 +130,7 @@ export default function Astronauts() {
       setLimit(40); // Reset limit
       setHasMore(true); // Reset hasMore flag
       fetcher.load(
-        `/astronauts?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
+        `/astronauts/in-space?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
       );
     }
   }, [statusId, nationality]);
@@ -143,7 +144,7 @@ export default function Astronauts() {
     <main className='flex-1'>
       <div className='flex flex-col gap-2 mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
         <div className='my-4'>
-          <TypographyH1>Astronauts</TypographyH1>
+          <TypographyH1>Astronauts Currently in Space</TypographyH1>
           <TypographyMuted>
             Sorted by time in space, most time in space first.
           </TypographyMuted>
@@ -228,7 +229,7 @@ export default function Astronauts() {
             )}
           </>
         ) : fetcher.state === 'loading' ? (
-          <div className='flex  justify-center mt-16 h-screen'>
+          <div className='flex justify-center mt-16 h-screen'>
             <Loader2Icon className='h-8 w-8 animate-spin' />
           </div>
         ) : (

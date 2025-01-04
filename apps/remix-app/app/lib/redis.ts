@@ -8,9 +8,13 @@ export const CACHE_DURATIONS = {
   LAUNCH_DETAIL: 1800, // 30 mins for individual launch details
   AGENCY: 86400, // 24 hours for agency info
   DEFAULT: 3600, // 1 hour default
+  CONFIG: 2592000, // 30 days for config
 } as const;
 
 export function getCacheDuration(url: string) {
+  if (url.includes('/config')) {
+    return CACHE_DURATIONS.CONFIG;
+  }
   if (url.includes('/launches/upcoming')) {
     return CACHE_DURATIONS.UPCOMING_LIST;
   }

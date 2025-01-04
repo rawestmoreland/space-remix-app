@@ -19,6 +19,14 @@ export function Footer() {
         <Link className='text-xs hover:underline underline-offset-4' to='#'>
           Unsubscribe
         </Link> */}
+        <a href='https://www.westmorelandcreative.com'>
+          <p className='text-xs hover:underline underline-offset-4'>
+            Westmoreland Creative
+          </p>
+        </a>
+        <a href='mailto:richard@westmorelandcreative.com'>
+          <p className='text-xs hover:underline underline-offset-4'>Contact</p>
+        </a>
       </nav>
     </footer>
   );

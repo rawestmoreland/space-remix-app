@@ -13,15 +13,15 @@ import {
   NewspaperIcon,
   RocketIcon,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FormSuccessDialog } from '~/components/form-success-dialog';
-import { Testimonial } from '~/components/testimonial';
+import { SpaceStat } from '~/components/space-stat';
 import { AnimatedSubscribeButton } from '~/components/ui/animated-subscribe-button';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import Marquee from '~/components/ui/marquee';
-import { ITestimonial, testimonials } from '~/lib/constants';
 import { cn } from '~/lib/utils';
+import { getAstronauts } from '~/services/astronautService';
 import { getLaunches, ILaunchResult } from '~/services/launchService';
 import { IArticle } from '~/services/newsService';
 import { createContact } from '~/services/sendfoxService';
@@ -43,31 +43,70 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   try {
-    const response = await axios.get(
-      `https://api.spaceflightnewsapi.net/v4/articles?limit=7&ordering=published_at`
-    );
-    const { data, error } = await getLaunches(
-      `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
-    );
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const [
+      articlesResponse,
+      launchesResponse,
+      launchesThisWeekResponse,
+      astronautsResponse,
+      issResponse,
+    ] = await Promise.all([
+      axios.get(
+        `https://api.spaceflightnewsapi.net/v4/articles?limit=7&ordering=published_at`
+      ),
+      getLaunches(
+        `${process.env.LL_BASE_URL}/launches/upcoming?limit=7&ordering=net`
+      ),
+      getLaunches(
+        `${process.env.LL_BASE_URL}/launches/upcoming?net_gte=${today.toISOString()}&net_lte=${nextWeek.toISOString()}`
+      ),
+      getAstronauts(
+        `${process.env.LL_BASE_URL}/astronauts?in_space=true&is_human=true`
+      ),
+      fetch('http://localhost:5173/api/iss-location').then((res) => res.json()),
+    ]);
 
     return json({
-      articles: response.data.results,
-      launches: error ? null : data?.results,
+      articles: articlesResponse.data.results,
+      launches: launchesResponse.error ? null : launchesResponse.data?.results,
+      launchesThisWeek: launchesThisWeekResponse.error
+        ? null
+        : launchesThisWeekResponse.data?.results.length,
+      astronauts: astronautsResponse.error
+        ? null
+        : astronautsResponse.data?.results,
+      issSpeed: issResponse.error ? null : '7.66 km/s',
+      issLocation: issResponse.error ? null : issResponse.data.iss_position,
       error: null,
     });
   } catch (error) {
+    console.error(error);
     if (isAxiosError(error)) {
       const axiosError = error as AxiosError;
       return json({
         articles: null,
         launches: null,
+        astronauts: null,
+        issSpeed: null,
+        issLocation: null,
+        launchesThisWeek: null,
         error:
           axiosError.response?.data ||
           axiosError.message ||
           'An error occurred',
       });
     }
-    return json({ articles: null, launches: null, error: 'An error occurred' });
+    return json({
+      articles: null,
+      launches: null,
+      astronauts: null,
+      launchesThisWeek: null,
+      issSpeed: null,
+      issLocation: null,
+      error: 'An error occurred',
+    });
   }
 };
 
@@ -82,7 +121,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Index() {
-  const { articles, launches } = useLoaderData<typeof loader>();
+  const {
+    articles,
+    launches,
+    astronauts,
+    launchesThisWeek,
+    issLocation: initialIssLocation,
+  } = useLoaderData<typeof loader>();
   const formRef = useRef<HTMLFormElement>(null);
   const fetcher = useFetcher<typeof action>();
   const [displayFormSuccess, setDisplayFormSuccess] = useState(false);
@@ -95,15 +140,28 @@ export default function Index() {
     }
   }, [fetcher.state, fetcher.data]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetcher.load('/api/iss-location');
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [fetcher]);
+
+  // Memoize the ISS location data
+  const issLocation = useMemo(() => {
+    const currentLocation =
+      fetcher.data?.data?.iss_position ?? initialIssLocation;
+    if (!currentLocation) return 'Unknown';
+
+    return `${currentLocation.latitude}, ${currentLocation.longitude}`;
+  }, [fetcher.data, initialIssLocation]);
+
   return (
     <main className='flex-1'>
-      <section className='w-full py-12 md:py-24 lg:py-32 xl:py-48'>
+      <section className='w-full py-12'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
           <div className='overflow-hidden flex flex-col items-center space-y-4 text-center'>
             <div className='space-y-2'>
-              <h2 className='text-xl font-bold tracking-tighter sm:text-4xl md:text-3xl lg:text-4xl/none'>
-                Launching soon!
-              </h2>
               <h1 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none'>
                 Your Weekly Dose of Space Exploration
               </h1>
@@ -182,84 +240,72 @@ export default function Index() {
           )}
         </div>
       </section>
-      <FormSuccessDialog
-        isOpen={displayFormSuccess}
-        onClose={() => {
-          formRef.current?.reset();
-          setDisplayFormSuccess(false);
-        }}
-      />
-    </main>
-  );
 
-  return (
-    <main className='flex-1'>
-      <section className='w-full bg-slate-50 py-12 md:py-24 lg:py-32 xl:py-48'>
+      <section className='w-full py-12 bg-gradient-to-b from-slate-50 to-slate-100'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
-          <div className='flex flex-col items-center space-y-4 text-center'>
+          <div className='flex flex-col items-center justify-center space-y-8 text-center'>
             <div className='space-y-2'>
-              <h1 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none'>
-                Your Weekly Dose of Space Exploration
-              </h1>
-              <p className='mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl'>
-                Stay informed about upcoming rocket launches, space missions,
-                and industry news with our curated weekly newsletter.
-              </p>
+              <h2 className='text-3xl font-bold tracking-tighter md:text-4xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'>
+                Current Space Stats
+              </h2>
+              <div className='h-1 w-20 mx-auto bg-gradient-to-r from-primary to-primary/70 rounded-full'></div>
             </div>
-            <div className='w-full max-w-sm space-y-2'>
-              <fetcher.Form
-                ref={formRef}
-                method='post'
-                className='flex flex-col gap-2 sm:flex-row'
-              >
-                <Input
-                  name='email'
-                  required
-                  className='flex-1'
-                  placeholder='Enter your email'
-                  type='email'
-                />
-                <Button type='submit'>
-                  Subscribe
-                  <ChevronRightIcon className='ml-2 h-4 w-4' />
-                </Button>
-              </fetcher.Form>
-              <p className='text-xs text-gray-500 dark:text-gray-400'>
-                Join over 10,000 space enthusiasts. Unsubscribe at any time.
-              </p>
+            <div className='grid gap-6 lg:grid-cols-3 w-full'>
+              <SpaceStat
+                to='/astronauts/in-space'
+                title='Astronauts in Space'
+                value={astronauts?.length ?? 'Unknown'}
+                className='transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm rounded-xl border border-slate-200'
+              />
+              <SpaceStat
+                to='/launches/upcoming'
+                title='Launches this Week'
+                value={launchesThisWeek?.toString() ?? 'Unknown'}
+                className='transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm rounded-xl border border-slate-200'
+              />
+              <SpaceStat
+                title='ISS Location'
+                value={issLocation}
+                className='transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm rounded-xl border border-slate-200'
+              />
             </div>
           </div>
         </div>
       </section>
-      <section className='w-full py-12 md:py-24 lg:py-32'>
+
+      <section className='w-full py-12'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
           <div className='grid gap-10 sm:grid-cols-2 lg:grid-cols-3'>
             <div className='flex flex-col items-center space-y-4 text-center'>
               <div className='rounded-full bg-primary p-3'>
-                <MailIcon className='h-6 w-6 text-white' />
+                <MailIcon className='h-6 w-6' />
               </div>
-              <h2 className='text-xl font-bold'>Weekly Digest</h2>
-              <p className='text-gray-500 dark:text-gray-400'>
+              <h2 className='text-xl text-primary font-bold'>Weekly Digest</h2>
+              <p className='text-white'>
                 Receive a comprehensive summary of the week&apos;s most
                 important space events and launches.
               </p>
             </div>
             <div className='flex flex-col items-center space-y-4 text-center'>
               <div className='rounded-full bg-primary p-3'>
-                <CalendarIcon className='h-6 w-6 text-white' />
+                <CalendarIcon className='h-6 w-6' />
               </div>
-              <h2 className='text-xl font-bold'>Launch Calendar</h2>
-              <p className='text-gray-500 dark:text-gray-400'>
+              <h2 className='text-xl text-primary font-bold'>
+                Launch Calendar
+              </h2>
+              <p className='text-white'>
                 Get an up-to-date schedule of upcoming rocket launches from
                 around the world.
               </p>
             </div>
             <div className='flex flex-col items-center space-y-4 text-center'>
               <div className='rounded-full bg-primary p-3'>
-                <NewspaperIcon className='h-6 w-6 text-white' />
+                <NewspaperIcon className='h-6 w-6' />
               </div>
-              <h2 className='text-xl font-bold'>Industry Insights</h2>
-              <p className='text-gray-500 dark:text-gray-400'>
+              <h2 className='text-xl text-primary font-bold'>
+                Industry Insights
+              </h2>
+              <p className='text-white'>
                 Dive into expert analysis and breaking news from the space
                 industry.
               </p>
@@ -267,7 +313,8 @@ export default function Index() {
           </div>
         </div>
       </section>
-      <section className='w-full bg-slate-50 py-12 md:py-24 lg:py-32'>
+
+      {/* <section className='w-full bg-slate-50 py-12'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
           <div className='flex flex-col items-center justify-center space-y-4 text-center'>
             <div className='space-y-2'>
@@ -290,15 +337,16 @@ export default function Index() {
             </div>
           </div>
         </div>
-      </section>
-      <section className='w-full py-12 md:py-24 lg:py-32'>
+      </section> */}
+
+      <section className='w-full py-12 md:py-24 lg:py-32 bg-slate-50'>
         <div className='container mx-auto max-w-6xl px-4 md:px-6'>
           <div className='flex flex-col items-center justify-center space-y-4 text-center'>
             <div className='space-y-2'>
-              <h2 className='text-3xl font-bold tracking-tighter md:text-4xl'>
+              <h2 className='text-3xl font-bold text-primary tracking-tighter md:text-4xl'>
                 Ready for Liftoff?
               </h2>
-              <p className='mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed'>
+              <p className='mx-auto max-w-[600px] text-muted md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed'>
                 Subscribe now and never miss an important space event again.
                 Your journey through the cosmos starts here.
               </p>
@@ -325,6 +373,7 @@ export default function Index() {
           </div>
         </div>
       </section>
+
       <FormSuccessDialog
         isOpen={displayFormSuccess}
         onClose={() => {

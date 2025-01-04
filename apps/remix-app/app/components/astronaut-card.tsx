@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
 import { IAstronaut } from '~/services/astronautService';
 import { useMemo } from 'react';
+import { Orbit } from 'lucide-react';
 
 export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
   const status = useMemo(() => {
@@ -22,6 +23,12 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
   return (
     <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
       <div className='relative h-48 overflow-hidden bg-muted'>
+        {astronaut.in_space && (
+          <div className='absolute right-2 top-2 z-10 flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-sm text-white backdrop-blur-sm'>
+            <Orbit className='h-4 w-4 animate-pulse text-blue-400' />
+            <span>In Space</span>
+          </div>
+        )}
         <img
           src={astronaut.image?.image_url ?? '/placeholder-rocket.jpg'}
           alt={astronaut.name}
@@ -32,7 +39,9 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
         <h3 className='mb-2 line-clamp-2 text-xl font-bold'>
           {astronaut.name}
         </h3>
-        <Badge variant={status}>{astronaut.status.name}</Badge>
+        <Badge variant={status}>
+          {astronaut.status?.name ?? 'Unknown Status'}
+        </Badge>
         {/* <div className='mb-2 flex items-center'>
           <RocketIcon className='mr-2 h-4 w-4 text-muted-foreground' />
           <TypographyMuted>{}</TypographyMuted>
@@ -44,7 +53,7 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
       </CardContent>
       <CardFooter className='bg-background pt-4'>
         <Badge className='line-clamp-1' variant='default'>
-          {astronaut.agency.name}
+          {astronaut.agency?.name ?? 'Unknown Agency'}
         </Badge>
       </CardFooter>
     </Card>
