@@ -5,6 +5,9 @@ import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 
 export async function loader() {
   const posts = await prisma.newsletterPost.findMany({
+    where: {
+      status: 'PUBLISHED',
+    },
     orderBy: {
       pubDate: 'desc',
     },
