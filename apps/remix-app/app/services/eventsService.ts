@@ -58,7 +58,7 @@ export async function getEvents(
       return { data: cachedData as IEventResponse, error: null };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -96,7 +96,7 @@ export async function getEventById(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);

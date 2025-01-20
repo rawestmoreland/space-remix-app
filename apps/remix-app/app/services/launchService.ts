@@ -96,7 +96,7 @@ export async function getLaunches(
       return { data: cachedData as ILaunchResponse, error: null };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -134,7 +134,7 @@ export async function getLaunchById(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
@@ -170,7 +170,7 @@ export async function getLaunchStatuses() {
       return { data: cachedData, error: null };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
     await redis.set(url, JSON.stringify(response.data));
     await redis.expire(url, 60 * 60 * 24 * 7); // 7 days
     return { data: response.data, error: null };

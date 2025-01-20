@@ -45,7 +45,7 @@ export async function getAstronauts(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     // Get cache duration
     const cacheDuration = getCacheDuration(url);
