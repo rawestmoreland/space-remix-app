@@ -86,10 +86,7 @@ export default function Astronauts() {
         );
         return [...prevItems, ...uniqueNewItems];
       });
-      if (!fetcher.data.astronauts?.next === null) {
-        setHasMore(false);
-        return;
-      }
+
       if (fetcher.data.astronauts.next === null) {
         setHasMore(false);
       } else {
@@ -108,7 +105,7 @@ export default function Astronauts() {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
           fetcher.load(
-            `/astronauts?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
+            `/astronauts?offset=${offset}&limit=${limit}${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
           );
         }
       },
@@ -120,7 +117,7 @@ export default function Astronauts() {
     }
 
     return () => observer.disconnect();
-  }, [hasMore, offset, limit, fetcher]);
+  }, [hasMore, offset, limit, fetcher, nationality, statusId]);
 
   useEffect(() => {
     if (fetcher.state === 'idle') {
