@@ -83,7 +83,7 @@ export async function getAstronautStatuses(url: string) {
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
 
-    const response = await launchListRequest(url);
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
     const cacheDuration = getCacheDuration(url);
     if (process.env.NODE_ENV === 'production') {

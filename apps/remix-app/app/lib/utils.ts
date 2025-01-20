@@ -6,12 +6,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function launchListRequest(url: string) {
+export async function launchListRequest(url: string, apiKey: string) {
   const response = await axios.get(url, {
     headers:
       process.env.NODE_ENV === 'production'
         ? {
-            Authorization: `Token: ${process.env.LL_API_KEY}`,
+            Authorization: `Token ${apiKey}`,
           }
         : undefined,
   });
