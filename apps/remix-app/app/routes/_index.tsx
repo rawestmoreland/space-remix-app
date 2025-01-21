@@ -22,19 +22,24 @@ export const meta: MetaFunction = () => {
 export const loader = async () => {
   try {
     const today = new Date();
-    const todayString = today.toISOString();
-
     const currentDay = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
-    const daysUntilSunday = currentDay === 0 ? 7 : 7 - currentDay;
+
+    // Calculate days until next Sunday (0 if today is Sunday)
+    const daysUntilSunday = currentDay === 0 ? 0 : 7 - currentDay;
+    // Calculate days since last Sunday
+    const daysSinceLastSunday = currentDay;
 
     const nextSunday = new Date(today);
+    const lastSunday = new Date(today);
+    lastSunday.setDate(today.getDate() - daysSinceLastSunday);
     nextSunday.setDate(today.getDate() + daysUntilSunday);
     const nextSundayString = nextSunday.toISOString();
+    const lastSundayString = lastSunday.toISOString();
 
     const [launchesThisWeekResponse, launchesResponse, astronautsResponse] =
       await Promise.all([
         getLaunches(
-          `${process.env.LL_BASE_URL}/launches/upcoming?net__gte=${todayString}&net__lte=${nextSundayString}`
+          `${process.env.LL_BASE_URL}/launches/upcoming?net__gte=${lastSundayString}&net__lte=${nextSundayString}`
         ),
         getLaunches(`${process.env.LL_BASE_URL}/launches?ordering=net`),
         getAstronauts(
