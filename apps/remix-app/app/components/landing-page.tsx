@@ -31,7 +31,7 @@ const facilities = [
     name: 'Baikonur Cosmodrome',
     location: 'Kazakhstan',
     description:
-      'World&apos;s first spaceport, located in Kazakhstan. Launch site for Soyuz missions to the ISS.',
+      "World's first spaceport, located in Kazakhstan. Launch site for Soyuz missions to the ISS.",
     launches: 1350,
     nextLaunch: '2025-02-01',
     image:
@@ -174,80 +174,86 @@ const LandingPage = ({
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {/* SpaceX Card */}
-            <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden'>
-              <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+            <Link to='/news/spacex'>
+              <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer min-h-[300px]'>
+                <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
 
-              <CardHeader>
-                <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
-                  <RocketIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
-                </div>
-                <CardTitle className='group-hover:text-primary transition-colors'>
-                  SpaceX Starship Progress
-                </CardTitle>
-              </CardHeader>
+                <CardHeader>
+                  <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
+                    <RocketIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
+                  </div>
+                  <CardTitle className='group-hover:text-primary transition-colors'>
+                    SpaceX Starship Progress
+                  </CardTitle>
+                </CardHeader>
 
-              <CardContent>
-                <p className='text-muted-foreground mb-4'>
-                  Track the development of humanity&apos;s most powerful rocket,
-                  designed to revolutionize space travel and enable Mars
-                  colonization.
-                </p>
-                <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                  <span className='text-sm font-medium mr-1'>Learn more</span>
-                  <ArrowRight className='h-4 w-4' />
-                </div>
-              </CardContent>
-            </Card>
+                <CardContent>
+                  <p className='text-muted-foreground mb-4'>
+                    Track the development of humanity&apos;s most powerful
+                    rocket, designed to revolutionize space travel and enable
+                    Mars colonization.
+                  </p>
+                  <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
+                    <span className='text-sm font-medium mr-1'>Learn more</span>
+                    <ArrowRight className='h-4 w-4' />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
 
             {/* Artemis Card */}
-            <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden'>
-              <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+            <Link to='/news/artemis'>
+              <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer min-h-[300px]'>
+                <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
 
-              <CardHeader>
-                <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
-                  <MoonIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
-                </div>
-                <CardTitle className='group-hover:text-primary transition-colors'>
-                  Artemis Program Updates
-                </CardTitle>
-              </CardHeader>
+                <CardHeader>
+                  <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
+                    <MoonIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
+                  </div>
+                  <CardTitle className='group-hover:text-primary transition-colors'>
+                    Artemis Program Updates
+                  </CardTitle>
+                </CardHeader>
 
-              <CardContent>
-                <p className='text-muted-foreground mb-4'>
-                  Follow NASA&apos;s ambitious plan to return humans to the Moon
-                  and establish sustainable lunar presence by 2025.
-                </p>
-                <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                  <span className='text-sm font-medium mr-1'>Learn more</span>
-                  <ArrowRight className='h-4 w-4' />
-                </div>
-              </CardContent>
-            </Card>
+                <CardContent>
+                  <p className='text-muted-foreground mb-4'>
+                    Follow NASA&apos;s ambitious plan to return humans to the
+                    Moon and establish sustainable lunar presence by 2025.
+                  </p>
+                  <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
+                    <span className='text-sm font-medium mr-1'>Learn more</span>
+                    <ArrowRight className='h-4 w-4' />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
 
             {/* Commercial Space Card */}
-            <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden'>
-              <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+            <Link to='/news/commercial-space'>
+              <Card className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer min-h-[300px]'>
+                <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
 
-              <CardHeader>
-                <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
-                  <DollarSignIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
-                </div>
-                <CardTitle className='group-hover:text-primary transition-colors'>
-                  Commercial Space Growth
-                </CardTitle>
-              </CardHeader>
+                <CardHeader>
+                  <div className='mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
+                    <DollarSignIcon className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
+                  </div>
+                  <CardTitle className='group-hover:text-primary transition-colors'>
+                    Commercial Space Growth
+                  </CardTitle>
+                </CardHeader>
 
-              <CardContent>
-                <p className='text-muted-foreground mb-4'>
-                  Discover how private companies are transforming space
-                  exploration and creating new opportunities in orbit.
-                </p>
-                <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                  <span className='text-sm font-medium mr-1'>Learn more</span>
-                  <ArrowRight className='h-4 w-4' />
-                </div>
-              </CardContent>
-            </Card>
+                <CardContent>
+                  <p className='text-muted-foreground mb-4'>
+                    Discover how private companies are transforming space
+                    exploration and creating new opportunities in orbit.
+                  </p>
+                  <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
+                    <span className='text-sm font-medium mr-1'>Learn more</span>
+                    <ArrowRight className='h-4 w-4' />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
@@ -282,7 +288,7 @@ const LandingPage = ({
                   </h3>
                 </div>
 
-                <p className='text-muted-foreground mb-6'>
+                <p className='text-muted-foreground mb-6 min-h-[80px]'>
                   Modern rockets come in various sizes and capabilities, from
                   small satellite launchers to heavy-lift vehicles. Each design
                   represents a careful balance between payload capacity, cost,
@@ -359,7 +365,7 @@ const LandingPage = ({
                   </h3>
                 </div>
 
-                <p className='text-muted-foreground mb-6'>
+                <p className='text-muted-foreground mb-6 min-h-[80px]'>
                   Different missions require different orbits. Understanding
                   orbital mechanics is crucial for successful space missions.
                 </p>
