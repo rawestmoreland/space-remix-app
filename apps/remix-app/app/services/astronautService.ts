@@ -2,12 +2,13 @@ import { isAxiosError, AxiosError } from 'axios';
 import { getCacheDuration, getCacheForURL } from '~/lib/redis';
 import { launchListRequest } from '~/lib/utils';
 import { redis } from '~/redis.server';
+import { ILaunchResult } from '~/services/launchService';
 import {
   checkRateLimit,
   updateRateLimitTracking,
 } from '~/services/rateLimitService';
 
-export interface IAstronaut {
+export interface IAstronautResult {
   id: number;
   name: string;
   age: number;
@@ -25,6 +26,7 @@ export interface IAstronaut {
   last_flight: string;
   first_flight: string;
   eva_time: string;
+  flights: ILaunchResult[];
   social_media_links: { social_media: { name: string }; url: string }[];
 }
 
@@ -32,7 +34,7 @@ export interface IAstronautResponse {
   count: number;
   next: string;
   previous: string;
-  results: IAstronaut[];
+  results: IAstronautResult[];
   error: string | null;
 }
 
@@ -88,14 +90,14 @@ export async function getAstronauts(
 
 export async function getAstronautById(
   url: string
-): Promise<{ data: IAstronaut | null; error: string | null }> {
+): Promise<{ data: IAstronautResult | null; error: string | null }> {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
     if (!rateLimit.canProceed && process.env.NODE_ENV === 'production') {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
-        return { data: cachedData as IAstronaut, error: null };
+        return { data: cachedData as IAstronautResult, error: null };
       }
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
@@ -115,7 +117,7 @@ export async function getAstronautById(
       await updateRateLimitTracking();
     }
 
-    return { data: response.data as IAstronaut, error: null };
+    return { data: response.data as IAstronautResult, error: null };
   } catch (error) {
     if (isAxiosError(error)) {
       const axiosError = error as AxiosError;

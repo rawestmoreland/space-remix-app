@@ -1,11 +1,17 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
 import invariant from 'tiny-invariant';
-import { getAstronautById, IAstronaut } from '~/services/astronautService';
+import {
+  getAstronautById,
+  IAstronautResult,
+} from '~/services/astronautService';
 import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { CalendarIcon, UserIcon, GlobeIcon, RocketIcon } from 'lucide-react';
 import { getUrlSession } from '~/sessions.server';
 import { AstronautBreadcrumbs } from '~/components/astronauts/astronaut-breadcrumbs';
+import { isoDurationToHumanReadable } from '~/lib/utils';
+import { Badge } from '~/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const session = await getUrlSession(request.headers.get('Cookie'));
@@ -21,7 +27,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  return json({ astronaut: astronaut.data as IAstronaut, urlContext });
+  return json({
+    astronaut: astronaut.data as IAstronautResult,
+    urlContext,
+  });
 }
 
 export default function AstronautInfo() {
@@ -86,24 +95,74 @@ export default function AstronautInfo() {
           <p>{astronaut.bio}</p>
         </section>
 
-        <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
-          <h2 className='text-2xl font-semibold mb-3'>Space Experience</h2>
-          <ul className='list-disc list-inside space-y-2'>
-            <li>Time in Space: {astronaut.time_in_space}</li>
-            <li>Number of Flights: {astronaut.flights_count}</li>
-            <li>Number of Landings: {astronaut.landings_count}</li>
-            <li>Number of Spacewalks: {astronaut.spacewalks_count}</li>
-            <li>EVA Time: {astronaut.eva_time}</li>
-            <li>
-              First Flight:{' '}
-              {new Date(astronaut.first_flight).toLocaleDateString()}
-            </li>
-            <li>
-              Last Flight:{' '}
-              {new Date(astronaut.last_flight).toLocaleDateString()}
-            </li>
-          </ul>
-        </section>
+        <Tabs defaultValue='experience' className='w-full'>
+          <TabsList className='grid w-full grid-cols-2'>
+            <TabsTrigger value='experience'>Experience</TabsTrigger>
+            <TabsTrigger value='missions'>Past Missions</TabsTrigger>
+          </TabsList>
+
+          <TabsContent
+            value='experience'
+            className='bg-card p-4 rounded-lg shadow-xl border border-muted'
+          >
+            <h2 className='text-2xl font-semibold mb-3'>Space Experience</h2>
+            <div className='space-y-2'>
+              <div>
+                Time in Space:{' '}
+                {isoDurationToHumanReadable(astronaut.time_in_space)}
+              </div>
+              <div>Number of Flights: {astronaut.flights_count}</div>
+              <div>Number of Landings: {astronaut.landings_count}</div>
+              <div>Number of Spacewalks: {astronaut.spacewalks_count}</div>
+              <div>
+                EVA Time: {isoDurationToHumanReadable(astronaut.eva_time)}
+              </div>
+              <div>
+                First Flight:{' '}
+                {new Date(astronaut.first_flight).toLocaleDateString()}
+              </div>
+              <div>
+                Last Flight:{' '}
+                {new Date(astronaut.last_flight).toLocaleDateString()}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent
+            value='missions'
+            className='bg-card p-4 rounded-lg shadow-xl border border-muted'
+          >
+            <h2 className='text-2xl font-semibold mb-3'>Past Missions</h2>
+            <div className='space-y-4'>
+              {astronaut.flights?.map((flight) => {
+                return (
+                  <div key={flight.id} className='border-b pb-4 last:border-0'>
+                    <h3 className='font-semibold text-lg'>{flight.name}</h3>
+                    <div className='flex items-center gap-2 mt-1'>
+                      <Badge variant='outline'>
+                        {new Date(flight.net).toLocaleDateString()}
+                      </Badge>
+                      <Badge
+                        variant={
+                          flight.status.name === 'Launch Successful'
+                            ? 'default'
+                            : 'secondary'
+                        }
+                      >
+                        {flight.status.name}
+                      </Badge>
+                    </div>
+                    {flight.mission && (
+                      <p className='mt-2 text-sm text-muted-foreground'>
+                        {flight.mission.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {astronaut.social_media_links.length > 0 && (
           <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>

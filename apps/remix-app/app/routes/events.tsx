@@ -3,7 +3,6 @@ import {
   useFetcher,
   useLoaderData,
   json,
-  Link,
 } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -116,9 +115,7 @@ export default function UpcomingEvents() {
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>
               {items.map((event: IEventResult) => (
-                <Link to={`/event/${event.id}`} key={`event-${event.id}`}>
-                  <EventCard event={event} />
-                </Link>
+                <EventCard key={event.id} event={event} />
               ))}
             </div>
             {hasMore && (

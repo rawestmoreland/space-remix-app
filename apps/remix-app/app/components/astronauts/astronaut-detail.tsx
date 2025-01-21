@@ -2,10 +2,14 @@ import { isoDurationToHumanReadable } from '~/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
-import { IAstronaut } from '~/services/astronautService';
+import { IAstronautResult } from '~/services/astronautService';
 import { InstagramIcon, TwitterIcon } from 'lucide-react';
 
-export function AstronautDetail({ astronaut }: { astronaut: IAstronaut }) {
+export function AstronautDetail({
+  astronaut,
+}: {
+  astronaut: IAstronautResult;
+}) {
   return (
     <ScrollArea className='max-h-[80vh] pr-4'>
       <div className='flex flex-col gap-4'>

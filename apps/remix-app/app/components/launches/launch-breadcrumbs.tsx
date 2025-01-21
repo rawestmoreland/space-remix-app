@@ -17,7 +17,6 @@ type LaunchBreadcrumbsProps = {
 
 export function LaunchBreadcrumbs({
   urlContext,
-  className,
   launchName,
 }: LaunchBreadcrumbsProps) {
   const location = useLocation();
@@ -95,19 +94,19 @@ export function LaunchBreadcrumbs({
   const breadcrumbItems = generateBreadcrumbItems();
 
   return (
-    <Breadcrumb className={className}>
-      <BreadcrumbList>
+    <Breadcrumb>
+      <BreadcrumbList className='flex items-center gap-2 mb-4'>
         {breadcrumbItems.map((item, index) => (
-          <BreadcrumbItem key={item.href}>
-            {index === breadcrumbItems.length - 1 ? (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            ) : (
-              <>
+          <div className='flex items-center gap-2' key={item.href}>
+            <BreadcrumbItem key={item.href}>
+              {index === breadcrumbItems.length - 1 ? (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              ) : (
                 <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                <BreadcrumbSeparator />
-              </>
-            )}
-          </BreadcrumbItem>
+              )}
+            </BreadcrumbItem>
+            {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
+          </div>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

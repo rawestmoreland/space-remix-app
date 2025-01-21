@@ -1,5 +1,8 @@
 import { redis } from '~/redis.server';
-import { IAstronaut, IAstronautResponse } from '~/services/astronautService';
+import {
+  IAstronautResult,
+  IAstronautResponse,
+} from '~/services/astronautService';
 import { IEventResponse } from '~/services/eventsService';
 import {
   ILauncherConfigFamilyResponse,
@@ -53,7 +56,7 @@ type CacheableResponse =
   | IEventResponse
   | ILocationResponse
   | IAstronautResponse
-  | IAstronaut
+  | IAstronautResult
   | ILauncherConfigResponse
   | ILauncherConfigFamilyResponse
   | ILaunchResult

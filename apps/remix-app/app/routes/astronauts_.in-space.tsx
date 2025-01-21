@@ -3,23 +3,16 @@ import {
   json,
   ClientLoaderFunctionArgs,
   useFetcher,
+  Link,
 } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { AstronautCard } from '~/components/astronauts/astronaut-card';
-import { AstronautDetail } from '~/components/astronauts/astronaut-detail';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
 import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getAstronauts,
   getAstronautStatuses,
-  IAstronaut,
+  IAstronautResult,
 } from '~/services/astronautService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
@@ -50,7 +43,9 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 export default function AstronautsInSpace() {
   const { astronauts } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<IAstronaut[]>(astronauts?.results || []);
+  const [items, setItems] = useState<IAstronautResult[]>(
+    astronauts?.results || []
+  );
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(astronauts?.results.length || 0);
   const [hasMore, setHasMore] = useState(astronauts?.next !== null);
@@ -59,12 +54,12 @@ export default function AstronautsInSpace() {
 
   useEffect(() => {
     if (fetcher.data) {
-      setItems((prevItems: IAstronaut[]) => {
+      setItems((prevItems: IAstronautResult[]) => {
         const newItems = fetcher.data?.astronauts?.results || [];
         const uniqueNewItems = newItems.filter(
-          (newItem: IAstronaut) =>
+          (newItem: IAstronautResult) =>
             !prevItems.some(
-              (prevItem: IAstronaut) => prevItem.id === newItem.id
+              (prevItem: IAstronautResult) => prevItem.id === newItem.id
             )
         );
         return [...prevItems, ...uniqueNewItems];
@@ -116,20 +111,14 @@ export default function AstronautsInSpace() {
         {items?.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {items.map((astronaut: IAstronaut) => (
-                <Dialog key={astronaut.id}>
-                  <DialogTrigger asChild>
-                    <div className='cursor-pointer'>
-                      <AstronautCard astronaut={astronaut} />
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className='max-w-3xl'>
-                    <DialogHeader>
-                      <DialogTitle>Astronaut Details</DialogTitle>
-                    </DialogHeader>
-                    <AstronautDetail astronaut={astronaut} />
-                  </DialogContent>
-                </Dialog>
+              {items.map((astronaut: IAstronautResult) => (
+                <Link
+                  to={`/astronaut/${astronaut.id}`}
+                  key={astronaut.id}
+                  prefetch='intent'
+                >
+                  <AstronautCard astronaut={astronaut} />
+                </Link>
               ))}
             </div>
             {hasMore && (

@@ -1,11 +1,11 @@
 import { Card, CardContent, CardFooter } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { IAstronaut } from '~/services/astronautService';
+import { IAstronautResult } from '~/services/astronautService';
 import { useMemo } from 'react';
 import { Orbit } from 'lucide-react';
 import { Link } from '@remix-run/react';
 
-export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
+export function AstronautCard({ astronaut }: { astronaut: IAstronautResult }) {
   const status = useMemo(() => {
     if (
       astronaut.status.name === 'Active' ||
@@ -30,11 +30,13 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
             <span>In Space</span>
           </div>
         )}
-        <img
-          src={astronaut.image?.image_url ?? '/placeholder-rocket.jpg'}
-          alt={astronaut.name}
-          className='h-full w-full object-contain transition-transform duration-300 group-hover:scale-105'
-        />
+        <Link to={`/astronaut/${astronaut.id}`}>
+          <img
+            src={astronaut.image?.image_url ?? '/placeholder-rocket.jpg'}
+            alt={astronaut.name}
+            className='h-full w-full object-contain transition-transform duration-300 group-hover:scale-105'
+          />
+        </Link>
       </div>
       <CardContent className='flex-grow p-4'>
         <Link
@@ -66,7 +68,7 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
             href={astronaut.image.license.link}
             target='_blank'
             rel='noopener noreferrer'
-            className='text-xs text-muted-foreground hover:underline'
+            className='text-xs text-muted-foreground hover:underline cursor-pointer'
           >
             Image: {astronaut.image.license.name}
           </a>

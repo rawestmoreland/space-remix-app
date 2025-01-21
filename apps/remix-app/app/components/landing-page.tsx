@@ -14,7 +14,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 
 import { ILaunchResponse } from '~/services/launchService';
-import { IAstronaut } from '~/services/astronautService';
+import { IAstronautResult } from '~/services/astronautService';
 import { ILocationResult } from '~/services/locationService';
 
 export const kennedy = 27;
@@ -80,7 +80,7 @@ const LandingPage = ({
   nextLaunches,
   locationData,
 }: {
-  astronauts: IAstronaut[];
+  astronauts: IAstronautResult[];
   totalLaunches: number;
   launchesThisWeek: number;
   nextLaunches?: {

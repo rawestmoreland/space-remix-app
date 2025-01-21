@@ -4,16 +4,19 @@ import { RocketIcon } from 'lucide-react';
 import { TypographyMuted } from '../ui/typography';
 import { IEventResult } from '~/services/eventsService';
 import { formatDate, formatTime } from '~/lib/utils';
+import { Link } from '@remix-run/react';
 
 export function EventCard({ event }: { event: IEventResult }) {
   return (
     <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
       <div className='relative h-48 overflow-hidden'>
-        <img
-          src={event.image?.image_url ?? '/placeholder-rocket.jpg'}
-          alt={event.name}
-          className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
-        />
+        <Link to={`/event/${event.id}`}>
+          <img
+            src={event.image?.image_url ?? '/placeholder-rocket.jpg'}
+            alt={event.name}
+            className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+          />
+        </Link>
       </div>
       <CardContent className='flex-grow p-4'>
         <h3 className='mb-2 line-clamp-2 text-xl font-bold'>{event.name}</h3>

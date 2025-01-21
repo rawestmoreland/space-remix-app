@@ -1,12 +1,12 @@
 import { useLocation } from '@remix-run/react';
 import { HomeIcon } from 'lucide-react';
 import {
-  Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbLink,
   BreadcrumbSeparator,
+  Breadcrumb,
 } from '~/components/ui/breadcrumb';
 
 type AstronautBreadcrumbsProps = {
@@ -15,7 +15,6 @@ type AstronautBreadcrumbsProps = {
 };
 
 export function AstronautBreadcrumbs({
-  className,
   astronautName,
 }: AstronautBreadcrumbsProps) {
   const location = useLocation();
@@ -55,19 +54,19 @@ export function AstronautBreadcrumbs({
   const breadcrumbItems = generateBreadcrumbItems();
 
   return (
-    <Breadcrumb className={className}>
-      <BreadcrumbList>
+    <Breadcrumb>
+      <BreadcrumbList className='flex items-center gap-2 mb-4'>
         {breadcrumbItems.map((item, index) => (
-          <BreadcrumbItem key={item.href}>
-            {index === breadcrumbItems.length - 1 ? (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            ) : (
-              <>
+          <div className='flex items-center gap-2' key={item.href}>
+            <BreadcrumbItem key={item.href}>
+              {index === breadcrumbItems.length - 1 ? (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              ) : (
                 <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                <BreadcrumbSeparator />
-              </>
-            )}
-          </BreadcrumbItem>
+              )}
+            </BreadcrumbItem>
+            {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
+          </div>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

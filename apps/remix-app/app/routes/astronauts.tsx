@@ -19,7 +19,7 @@ import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getAstronauts,
   getAstronautStatuses,
-  IAstronaut,
+  IAstronautResult,
   IAstronautStatus,
 } from '~/services/astronautService';
 
@@ -57,7 +57,9 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 export default function Astronauts() {
   const { astronauts, statuses } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<IAstronaut[]>(astronauts?.results || []);
+  const [items, setItems] = useState<IAstronautResult[]>(
+    astronauts?.results || []
+  );
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(astronauts?.results.length || 0);
   const [hasMore, setHasMore] = useState(astronauts?.next !== null);
@@ -68,12 +70,12 @@ export default function Astronauts() {
 
   useEffect(() => {
     if (fetcher.data) {
-      setItems((prevItems: IAstronaut[]) => {
+      setItems((prevItems: IAstronautResult[]) => {
         const newItems = fetcher.data?.astronauts?.results || [];
         const uniqueNewItems = newItems.filter(
-          (newItem: IAstronaut) =>
+          (newItem: IAstronautResult) =>
             !prevItems.some(
-              (prevItem: IAstronaut) => prevItem.id === newItem.id
+              (prevItem: IAstronautResult) => prevItem.id === newItem.id
             )
         );
         return [...prevItems, ...uniqueNewItems];
@@ -191,7 +193,7 @@ export default function Astronauts() {
         {items?.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {items.map((astronaut: IAstronaut) => (
+              {items.map((astronaut: IAstronautResult) => (
                 <AstronautCard key={astronaut.id} astronaut={astronaut} />
               ))}
             </div>
