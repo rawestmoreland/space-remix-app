@@ -8,7 +8,6 @@ import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { AstronautCard } from '~/components/astronauts/astronaut-card';
 import { AstronautDetail } from '~/components/astronauts/astronaut-detail';
-import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -16,19 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getAstronauts,
   getAstronautStatuses,
   IAstronaut,
-  IAstronautStatus,
 } from '~/services/astronautService';
 
 export async function loader({ request }: ClientLoaderFunctionArgs) {
@@ -40,18 +31,11 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 
   const offset = url.searchParams.get('offset') || '0';
   const limit = url.searchParams.get('limit') || '40';
-  const statusId = url.searchParams.get('status_ids') || '';
-  const nationality = url.searchParams.get('nationality') || '';
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
   queryURL.searchParams.append('in_space', 'true'); // Add this parameter
-  if (statusId) {
-    queryURL.searchParams.append('status_ids', statusId);
-  }
-  if (nationality) {
-    queryURL.searchParams.append('nationality', nationality);
-  }
+
   queryURL.searchParams.append('ordering', '-time_in_space');
   const { data, error } = await getAstronauts(queryURL.toString());
   const { data: statuses, error: statusesError } = await getAstronautStatuses(
@@ -64,14 +48,12 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 }
 
 export default function AstronautsInSpace() {
-  const { astronauts, statuses } = useLoaderData<typeof loader>();
+  const { astronauts } = useLoaderData<typeof loader>();
 
   const [items, setItems] = useState<IAstronaut[]>(astronauts?.results || []);
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(astronauts?.results.length || 0);
   const [hasMore, setHasMore] = useState(astronauts?.next !== null);
-  const [statusId, setStatusId] = useState<string | null>(null);
-  const [nationality, setNationality] = useState<string | null>(null);
   const fetcher = useFetcher<typeof loader>();
   const loaderRef = useRef<HTMLDivElement>(null);
 
@@ -108,9 +90,7 @@ export default function AstronautsInSpace() {
       (entries) => {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
-          fetcher.load(
-            `/astronauts/in-space?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
-          );
+          fetcher.load(`/astronauts/in-space?offset=${offset}&limit=${limit}`);
         }
       },
       { threshold: 1 }
@@ -123,23 +103,6 @@ export default function AstronautsInSpace() {
     return () => observer.disconnect();
   }, [hasMore, offset, limit, fetcher]);
 
-  useEffect(() => {
-    if (fetcher.state === 'idle') {
-      setItems([]); // Reset items when status changes
-      setOffset(0); // Reset offset
-      setLimit(40); // Reset limit
-      setHasMore(true); // Reset hasMore flag
-      fetcher.load(
-        `/astronauts/in-space?offset=0&limit=40${nationality === 'All' || !nationality ? '' : `&nationality=${nationality}`}${statusId === 'All' || !statusId ? '' : `&status_ids=${statusId}`}`
-      );
-    }
-  }, [statusId, nationality]);
-
-  const handleClearFilters = () => {
-    setStatusId(null);
-    setNationality(null);
-  };
-
   return (
     <main className='flex-1'>
       <div className='flex flex-col gap-2 mx-auto mb-8 w-full max-w-6xl px-4 md:px-0'>
@@ -149,57 +112,7 @@ export default function AstronautsInSpace() {
             Sorted by time in space, most time in space first.
           </TypographyMuted>
         </div>
-        <div className='flex gap-4'>
-          {statuses?.results && (
-            <Select
-              value={statusId || ''}
-              onValueChange={(value) => setStatusId(value)}
-            >
-              <SelectTrigger className='w-40'>
-                <SelectValue placeholder='Select Status' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='All'>All</SelectItem>
-                {statuses.results.map((status: IAstronautStatus) => (
-                  <SelectItem key={status.id} value={status.id.toString()}>
-                    {status.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          <Select
-            value={nationality || ''}
-            onValueChange={(value) => setNationality(value)}
-          >
-            <SelectTrigger className='w-40'>
-              <SelectValue placeholder='Select Nationality' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='All'>All</SelectItem>
-              {[
-                'American',
-                'Russian',
-                'Chinese',
-                'Japanese',
-                'French',
-                'Canadian',
-                'German',
-                'Italian',
-                'Spanish',
-                'Australian',
-                'Brazilian',
-              ].map((nationality: string) => (
-                <SelectItem key={nationality} value={nationality}>
-                  {nationality}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant='outline' onClick={handleClearFilters}>
-            Clear
-          </Button>
-        </div>
+
         {items?.length > 0 ? (
           <>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
