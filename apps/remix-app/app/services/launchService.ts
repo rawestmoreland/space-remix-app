@@ -48,6 +48,7 @@ export interface ILaunchResult {
   previous?: string;
   program: { name: string }[];
   probability?: number;
+  failreason?: string;
   rocket: {
     configuration: {
       name: string;

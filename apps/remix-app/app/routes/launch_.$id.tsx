@@ -78,6 +78,13 @@ export default function LaunchInfo() {
       </div>
 
       <div className='mt-8 space-y-6'>
+        {launch.failreason && (
+          <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
+            <h2 className='text-2xl font-semibold mb-3'>What happened?</h2>
+            <p>{launch.failreason}</p>
+          </section>
+        )}
+
         <section className='bg-card p-4 rounded-lg shadow-xl border border-muted'>
           <h2 className='text-2xl font-semibold mb-3'>Mission Details</h2>
           <p>
