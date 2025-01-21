@@ -13,11 +13,19 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 
+import { ILaunchResponse } from '~/services/launchService';
 import { IAstronaut } from '~/services/astronautService';
+import { ILocationResult } from '~/services/locationService';
+
+export const kennedy = 27;
+export const baikonur = 15;
+export const guiana = 13;
+export const brownsville = 143;
 
 const facilities = [
   {
     name: 'Kennedy Space Center',
+    id: kennedy,
     location: 'Florida, USA',
     description:
       'Historic NASA facility in Florida, USA. Home to the Apollo and Space Shuttle programs.',
@@ -29,6 +37,7 @@ const facilities = [
   },
   {
     name: 'Baikonur Cosmodrome',
+    id: baikonur,
     location: 'Kazakhstan',
     description:
       "World's first spaceport, located in Kazakhstan. Launch site for Soyuz missions to the ISS.",
@@ -40,6 +49,7 @@ const facilities = [
   },
   {
     name: 'Guiana Space Center',
+    id: guiana,
     location: 'French Guiana',
     description:
       'European spaceport near the equator, perfect for launches to geostationary orbit.',
@@ -51,6 +61,7 @@ const facilities = [
   },
   {
     name: 'Starbase',
+    id: brownsville,
     location: 'Texas, USA',
     description:
       "SpaceX's newest launch facility in Texas, focused on Starship development and testing.",
@@ -66,10 +77,24 @@ const LandingPage = ({
   astronauts,
   totalLaunches,
   launchesThisWeek,
+  nextLaunches,
+  locationData,
 }: {
   astronauts: IAstronaut[];
   totalLaunches: number;
   launchesThisWeek: number;
+  nextLaunches?: {
+    guiana: ILaunchResponse;
+    kennedy: ILaunchResponse;
+    baikonur: ILaunchResponse;
+    brownsville: ILaunchResponse;
+  };
+  locationData: {
+    guiana: ILocationResult;
+    kennedy: ILocationResult;
+    baikonur: ILocationResult;
+    brownsville: ILocationResult;
+  };
 }) => {
   return (
     <div className='flex flex-col'>
@@ -277,81 +302,87 @@ const LandingPage = ({
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             {/* Launch Vehicles Card */}
-            <Card className='group hover:shadow-lg transition-all duration-300 overflow-hidden'>
-              <CardContent className='p-6'>
-                <div className='flex items-center gap-3 mb-6'>
-                  <div className='bg-primary/10 rounded-full p-3 group-hover:scale-110 transition-transform duration-300'>
-                    <Rocket className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
+            <Link to='/vehicles'>
+              <Card className='group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer'>
+                <CardContent className='p-6'>
+                  <div className='flex items-center gap-3 mb-6'>
+                    <div className='bg-primary/10 rounded-full p-3 group-hover:scale-110 transition-transform duration-300'>
+                      <Rocket className='h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-300' />
+                    </div>
+                    <h3 className='text-xl font-semibold group-hover:text-primary transition-colors'>
+                      Launch Vehicles
+                    </h3>
                   </div>
-                  <h3 className='text-xl font-semibold group-hover:text-primary transition-colors'>
-                    Launch Vehicles
-                  </h3>
-                </div>
 
-                <p className='text-muted-foreground mb-6 min-h-[80px]'>
-                  Modern rockets come in various sizes and capabilities, from
-                  small satellite launchers to heavy-lift vehicles. Each design
-                  represents a careful balance between payload capacity, cost,
-                  and reliability.
-                </p>
+                  <p className='text-muted-foreground mb-6 min-h-[80px]'>
+                    Modern rockets come in various sizes and capabilities, from
+                    small satellite launchers to heavy-lift vehicles. Each
+                    design represents a careful balance between payload
+                    capacity, cost, and reliability.
+                  </p>
 
-                <div className='space-y-4'>
-                  <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
-                    <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
-                    <div className='relative flex items-center gap-3'>
-                      <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
-                        <Rocket className='h-4 w-4 text-primary' />
+                  <div className='space-y-4'>
+                    <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
+                      <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
+                      <div className='relative flex items-center gap-3'>
+                        <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
+                          <Rocket className='h-4 w-4 text-primary' />
+                        </div>
+                        <div>
+                          <div className='font-medium'>
+                            Small Launch Vehicles
+                          </div>
+                          <div className='text-sm text-muted-foreground'>
+                            0-2,000 kg to LEO
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <div className='font-medium'>Small Launch Vehicles</div>
-                        <div className='text-sm text-muted-foreground'>
-                          0-2,000 kg to LEO
+                    </div>
+
+                    <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
+                      <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
+                      <div className='relative flex items-center gap-3'>
+                        <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
+                          <Rocket className='h-4 w-4 text-primary' />
+                        </div>
+                        <div>
+                          <div className='font-medium'>
+                            Medium Launch Vehicles
+                          </div>
+                          <div className='text-sm text-muted-foreground'>
+                            2,000-20,000 kg to LEO
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
+                      <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
+                      <div className='relative flex items-center gap-3'>
+                        <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
+                          <Rocket className='h-4 w-4 text-primary' />
+                        </div>
+                        <div>
+                          <div className='font-medium'>
+                            Heavy Launch Vehicles
+                          </div>
+                          <div className='text-sm text-muted-foreground'>
+                            20,000+ kg to LEO
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
-                    <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
-                    <div className='relative flex items-center gap-3'>
-                      <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
-                        <Rocket className='h-4 w-4 text-primary' />
-                      </div>
-                      <div>
-                        <div className='font-medium'>
-                          Medium Launch Vehicles
-                        </div>
-                        <div className='text-sm text-muted-foreground'>
-                          2,000-20,000 kg to LEO
-                        </div>
-                      </div>
-                    </div>
+                  <div className='mt-6 flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
+                    <span className='text-sm font-medium mr-1'>
+                      Learn more about launch vehicles
+                    </span>
+                    <ArrowRight className='h-4 w-4' />
                   </div>
-
-                  <div className='group/item relative overflow-hidden rounded-lg border p-4 hover:border-primary/50 transition-colors'>
-                    <div className='absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity'></div>
-                    <div className='relative flex items-center gap-3'>
-                      <div className='bg-primary/10 rounded-full p-2 group-hover/item:scale-110 transition-transform'>
-                        <Rocket className='h-4 w-4 text-primary' />
-                      </div>
-                      <div>
-                        <div className='font-medium'>Heavy Launch Vehicles</div>
-                        <div className='text-sm text-muted-foreground'>
-                          20,000+ kg to LEO
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='mt-6 flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                  <span className='text-sm font-medium mr-1'>
-                    Learn more about launch vehicles
-                  </span>
-                  <ArrowRight className='h-4 w-4' />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
 
             {/* Orbits Card */}
             <Card className='group hover:shadow-lg transition-all duration-300 overflow-hidden'>
@@ -451,81 +482,97 @@ const LandingPage = ({
             </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            {facilities.map((facility, index) => (
-              <Card
-                key={index}
-                className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden'
-              >
-                {/* Hover gradient overlay */}
-                <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+          {nextLaunches && (
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              {facilities.map((facility, index) => {
+                const matchingLaunch = Object.values(nextLaunches).find(
+                  (nl) => nl?.results[0]?.pad?.location?.id === facility.id
+                );
+                const matchingLocation = Object.values(locationData).find(
+                  (ld) => ld?.id === facility.id
+                );
 
-                {/* Facility image */}
-                <div className='relative h-48 overflow-hidden'>
-                  <img
-                    src={facility.image}
-                    alt={facility.name}
-                    loading='lazy'
-                    className='w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500'
-                  />
-                  <div className='absolute inset-0 bg-gradient-to-t from-background to-transparent'></div>
-                  <div className='absolute bottom-4 left-4 flex items-center text-sm text-white'>
-                    <MapPin className='h-4 w-4 mr-1' />
-                    {facility.coordinates}
-                  </div>
-                </div>
+                return (
+                  <Card
+                    key={index}
+                    className='group hover:shadow-lg transition-all duration-300 relative overflow-hidden'
+                  >
+                    {/* Hover gradient overlay */}
+                    <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
 
-                <CardHeader className='relative pb-2'>
-                  <div className='flex items-center gap-3'>
-                    <div className='bg-primary/10 rounded-full p-2 group-hover:scale-110 transition-transform duration-300'>
-                      <MapPin className='h-5 w-5 text-primary group-hover:rotate-12 transition-transform duration-300' />
-                    </div>
-                    <h3 className='text-lg font-semibold group-hover:text-primary transition-colors'>
-                      {facility.name}
-                    </h3>
-                  </div>
-                </CardHeader>
-
-                <CardContent className='relative'>
-                  <p className='text-sm text-muted-foreground mb-4'>
-                    {facility.description}
-                  </p>
-
-                  <div className='grid grid-cols-2 gap-4 mb-4'>
-                    <div className='flex flex-col'>
-                      <div className='text-xs text-muted-foreground'>
-                        Total Launches
-                      </div>
-                      <div className='flex items-center mt-1'>
-                        <Rocket className='h-4 w-4 text-primary mr-1' />
-                        <span className='font-medium'>{facility.launches}</span>
+                    {/* Facility image */}
+                    <div className='relative h-48 overflow-hidden'>
+                      <img
+                        src={facility.image}
+                        alt={facility.name}
+                        loading='lazy'
+                        className='w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500'
+                      />
+                      <div className='absolute inset-0 bg-gradient-to-t from-background to-transparent'></div>
+                      <div className='absolute bottom-4 left-4 flex items-center text-sm text-white'>
+                        <MapPin className='h-4 w-4 mr-1' />
+                        {facility.coordinates}
                       </div>
                     </div>
-                    <div className='flex flex-col'>
-                      <div className='text-xs text-muted-foreground'>
-                        Next Launch
+
+                    <CardHeader className='relative pb-2'>
+                      <div className='flex items-center gap-3'>
+                        <div className='bg-primary/10 rounded-full p-2 group-hover:scale-110 transition-transform duration-300'>
+                          <MapPin className='h-5 w-5 text-primary group-hover:rotate-12 transition-transform duration-300' />
+                        </div>
+                        <h3 className='text-lg font-semibold group-hover:text-primary transition-colors'>
+                          {facility.name}
+                        </h3>
                       </div>
-                      <div className='flex items-center mt-1'>
-                        <Calendar className='h-4 w-4 text-primary mr-1' />
-                        <span className='font-medium'>
-                          {new Date(facility.nextLaunch).toLocaleDateString(
-                            'en-US'
-                          )}
+                    </CardHeader>
+
+                    <CardContent className='relative'>
+                      <p className='text-sm text-muted-foreground mb-4'>
+                        {facility.description}
+                      </p>
+
+                      <div className='grid grid-cols-2 gap-4 mb-4'>
+                        <div className='flex flex-col'>
+                          <div className='text-xs text-muted-foreground'>
+                            Total Launches
+                          </div>
+                          <div className='flex items-center mt-1'>
+                            <Rocket className='h-4 w-4 text-primary mr-1' />
+                            <span className='font-medium'>
+                              {matchingLocation?.total_launch_count ??
+                                'Unknown'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className='flex flex-col'>
+                          <div className='text-xs text-muted-foreground'>
+                            Next Launch
+                          </div>
+                          <div className='flex items-center mt-1'>
+                            <Calendar className='h-4 w-4 text-primary mr-1' />
+                            <span className='font-medium'>
+                              {matchingLaunch?.results[0]?.net
+                                ? new Date(
+                                    matchingLaunch?.results[0]?.net
+                                  ).toUTCString()
+                                : 'Unknown'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
+                        <span className='text-sm font-medium mr-1'>
+                          View launches
                         </span>
+                        <ArrowRight className='h-4 w-4' />
                       </div>
-                    </div>
-                  </div>
-
-                  <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                    <span className='text-sm font-medium mr-1'>
-                      View launches
-                    </span>
-                    <ArrowRight className='h-4 w-4' />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </div>

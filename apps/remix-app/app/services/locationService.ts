@@ -15,7 +15,7 @@ export interface ILocationResponse {
 }
 
 export interface ILocationResult {
-  id: string;
+  id: number;
   name: string;
   location: string;
   description: string;
@@ -23,6 +23,7 @@ export interface ILocationResult {
   nextLaunch: string;
   image: string;
   coordinates: string;
+  total_launch_count: number;
 }
 
 export async function getLocations(
@@ -70,14 +71,17 @@ export async function getLocations(
   }
 }
 
-export async function getLocationByID(url: string) {
+export async function getLocation(
+  id: number
+): Promise<{ data: ILocationResult | null; error: string | null }> {
+  const url = `${process.env.LL_BASE_URL}/locations/${id}`;
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
     if (!rateLimit.canProceed) {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
-        return { data: cachedData, error: null };
+        return { data: cachedData as ILocationResult, error: null };
       }
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
@@ -100,7 +104,7 @@ export async function getLocationByID(url: string) {
       return {
         data: null,
         error:
-          axiosError.response?.data ||
+          (axiosError.response?.data as string) ||
           axiosError.message ||
           'An error occurred',
       };

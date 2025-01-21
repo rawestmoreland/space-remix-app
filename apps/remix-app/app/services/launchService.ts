@@ -82,10 +82,11 @@ export interface ILaunchResult {
   pad: {
     name: string;
     location: {
+      id: number;
       name: string;
     };
   };
-
+  location_launch_attempt_count?: number;
   image: {
     image_url: string;
     license: { name: string; link: string };
@@ -143,14 +144,16 @@ export async function getLaunches(
   }
 }
 
-export async function getLaunchById(url: string) {
+export async function getLaunchById(
+  url: string
+): Promise<{ data: ILaunchResult | null; error: string | null }> {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
     if (!rateLimit.canProceed && isProduction) {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
-        return { data: cachedData, error: null };
+        return { data: cachedData as ILaunchResult, error: null };
       }
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
@@ -177,7 +180,7 @@ export async function getLaunchById(url: string) {
       return {
         data: null,
         error:
-          axiosError.response?.data ||
+          (axiosError.response?.data as string) ||
           axiosError.message ||
           'An error occurred',
       };
@@ -284,6 +287,54 @@ export async function getLaunchStatuses() {
         data: null,
         error:
           axiosError.response?.data ||
+          axiosError.message ||
+          'An error occurred',
+      };
+    }
+    return { data: null, error: 'An error occurred' };
+  }
+}
+
+export async function getNextLaunchByLocation(
+  location: number
+): Promise<{ data: ILaunchResponse | null; error: string | null }> {
+  const today = new Date().toISOString();
+  const url = `${process.env.LL_BASE_URL}/launches/upcoming/?limit=1&pad__location=${location}&ordering=net&net__gte=${today}`;
+
+  try {
+    // Add rate limiting check
+    const rateLimit = await checkRateLimit();
+    if (!rateLimit.canProceed && isProduction) {
+      const cachedData = await getCacheForURL(url);
+      if (cachedData) {
+        return { data: cachedData as ILaunchResponse, error: null };
+      }
+      return { data: null, error: 'Rate limit exceeded. Try again later.' };
+    }
+
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
+
+    // Cache the response with appropriate duration
+    const cacheDuration = getCacheDuration(url);
+
+    if (isProduction) {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
+
+    // Update rate limit tracking
+    if (isProduction) {
+      await updateRateLimitTracking();
+    }
+
+    return { data: response.data, error: null };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      return {
+        data: null,
+        error:
+          (axiosError.response?.data as string) ||
           axiosError.message ||
           'An error occurred',
       };

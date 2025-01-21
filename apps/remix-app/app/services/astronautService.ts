@@ -86,14 +86,16 @@ export async function getAstronauts(
   }
 }
 
-export async function getAstronautById(url: string) {
+export async function getAstronautById(
+  url: string
+): Promise<{ data: IAstronaut | null; error: string | null }> {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
     if (!rateLimit.canProceed && process.env.NODE_ENV === 'production') {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
-        return { data: cachedData, error: null };
+        return { data: cachedData as IAstronaut, error: null };
       }
       return { data: null, error: 'Rate limit exceeded. Try again later.' };
     }
@@ -113,14 +115,14 @@ export async function getAstronautById(url: string) {
       await updateRateLimitTracking();
     }
 
-    return { data: response.data, error: null };
+    return { data: response.data as IAstronaut, error: null };
   } catch (error) {
     if (isAxiosError(error)) {
       const axiosError = error as AxiosError;
       return {
         data: null,
         error:
-          axiosError.response?.data ||
+          (axiosError.response?.data as string) ||
           axiosError.message ||
           'An error occurred',
       };

@@ -1,8 +1,12 @@
 import { redis } from '~/redis.server';
-import { IAstronautResponse } from '~/services/astronautService';
+import { IAstronaut, IAstronautResponse } from '~/services/astronautService';
 import { IEventResponse } from '~/services/eventsService';
-import { ILaunchResponse } from '~/services/launchService';
-import { ILocationResponse } from '~/services/locationService';
+import {
+  ILauncherConfigFamilyResponse,
+  ILauncherConfigResponse,
+} from '~/services/launcherService';
+import { ILaunchResponse, ILaunchResult } from '~/services/launchService';
+import { ILocationResponse, ILocationResult } from '~/services/locationService';
 
 export const CACHE_DURATIONS = {
   UPCOMING_LIST: 3600, // 1 hour for upcoming launches list
@@ -13,6 +17,7 @@ export const CACHE_DURATIONS = {
   CONFIG: 2592000, // 30 days for config
   LOCATION: 86400, // 24 hours for location info
   ASTRONAUTS: 2592000, // 30 days for astronauts info
+  LAUNCHER_CONFIG_FAMILIES: 604800, // 1 week for launcher config families
 } as const;
 
 export function getCacheDuration(url: string) {
@@ -37,6 +42,9 @@ export function getCacheDuration(url: string) {
   if (url.includes('/astronauts')) {
     return CACHE_DURATIONS.ASTRONAUTS;
   }
+  if (url.includes('/launcher_configuration_families')) {
+    return CACHE_DURATIONS.LAUNCHER_CONFIG_FAMILIES;
+  }
   return CACHE_DURATIONS.DEFAULT;
 }
 
@@ -45,8 +53,12 @@ type CacheableResponse =
   | IEventResponse
   | ILocationResponse
   | IAstronautResponse
+  | IAstronaut
+  | ILauncherConfigResponse
+  | ILauncherConfigFamilyResponse
+  | ILaunchResult
+  | ILocationResult
   | null;
-
 export async function getCacheForURL(url: string): Promise<CacheableResponse> {
   if (process.env.NODE_ENV === 'development') return null;
 
