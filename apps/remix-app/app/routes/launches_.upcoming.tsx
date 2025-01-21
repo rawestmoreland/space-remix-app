@@ -3,18 +3,10 @@ import {
   useFetcher,
   useLoaderData,
   json,
-  Link,
 } from '@remix-run/react';
-import { ExternalLinkIcon, Loader2Icon } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { LaunchCard, LaunchDetail } from '~/components/launches';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
+import { LaunchCard } from '~/components/launches';
 import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getLaunches,
@@ -57,8 +49,6 @@ export default function UpcomingLaunches() {
   const [limit, setLimit] = useState(40);
   const [offset, setOffset] = useState(launches.results.length);
   const [hasMore, setHasMore] = useState(launches.next !== null);
-
-  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
 
   const fetcher = useFetcher<typeof loader>();
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -120,36 +110,9 @@ export default function UpcomingLaunches() {
         </TypographyMuted>
         {items?.length > 0 ? (
           <>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2  mt-8'>
               {items.map((launch: ILaunchResult) => (
-                <Dialog
-                  key={launch.id}
-                  open={launch.id == openDialogId}
-                  onOpenChange={(open) =>
-                    setOpenDialogId(open ? launch.id : null)
-                  }
-                >
-                  <DialogTrigger asChild>
-                    <div className='cursor-pointer'>
-                      <LaunchCard launch={launch} />
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className='max-w-3xl'>
-                    <DialogHeader>
-                      <DialogTitle>
-                        <Link
-                          onClick={() => setOpenDialogId(null)}
-                          className='flex gap-2 items-center hover:underline underline-offset-2'
-                          to={`/launch/${launch.id}`}
-                        >
-                          Launch Details{' '}
-                          <ExternalLinkIcon className='h-4 w-4' />
-                        </Link>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <LaunchDetail launch={launch} />
-                  </DialogContent>
-                </Dialog>
+                <LaunchCard key={launch.id} launch={launch} />
               ))}
             </div>
             {hasMore && (

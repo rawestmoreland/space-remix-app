@@ -1,6 +1,8 @@
 import { redis } from '~/redis.server';
+import { IAstronautResponse } from '~/services/astronautService';
 import { IEventResponse } from '~/services/eventsService';
 import { ILaunchResponse } from '~/services/launchService';
+import { ILocationResponse } from '~/services/locationService';
 
 export const CACHE_DURATIONS = {
   UPCOMING_LIST: 3600, // 1 hour for upcoming launches list
@@ -9,6 +11,8 @@ export const CACHE_DURATIONS = {
   AGENCY: 86400, // 24 hours for agency info
   DEFAULT: 3600, // 1 hour default
   CONFIG: 2592000, // 30 days for config
+  LOCATION: 86400, // 24 hours for location info
+  ASTRONAUTS: 2592000, // 30 days for astronauts info
 } as const;
 
 export function getCacheDuration(url: string) {
@@ -27,10 +31,21 @@ export function getCacheDuration(url: string) {
   if (url.includes('/agencies')) {
     return CACHE_DURATIONS.AGENCY;
   }
+  if (url.includes('/locations')) {
+    return CACHE_DURATIONS.LOCATION;
+  }
+  if (url.includes('/astronauts')) {
+    return CACHE_DURATIONS.ASTRONAUTS;
+  }
   return CACHE_DURATIONS.DEFAULT;
 }
 
-type CacheableResponse = ILaunchResponse | IEventResponse | null;
+type CacheableResponse =
+  | ILaunchResponse
+  | IEventResponse
+  | ILocationResponse
+  | IAstronautResponse
+  | null;
 
 export async function getCacheForURL(url: string): Promise<CacheableResponse> {
   if (process.env.NODE_ENV === 'development') return null;
@@ -39,7 +54,7 @@ export async function getCacheForURL(url: string): Promise<CacheableResponse> {
     const cachedData = await redis.get(url);
     if (!cachedData) return null;
 
-    return cachedData as ILaunchResponse;
+    return cachedData as CacheableResponse;
   } catch (error) {
     console.error('Cache retrieval error:', error);
     return null;

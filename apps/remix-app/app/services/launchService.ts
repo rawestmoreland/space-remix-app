@@ -14,6 +14,18 @@ export interface ILaunchStatus {
   abbrev: string;
 }
 
+export interface ICelestialBody {
+  id: number;
+  name: string;
+}
+
+export interface IOrbit {
+  id: number;
+  name: string;
+  abbrev: string;
+  celestial_body: ICelestialBody;
+}
+
 export interface ILaunchResponse {
   count: number;
   next: string;
@@ -35,6 +47,7 @@ export interface ILaunchResult {
   next?: string;
   previous?: string;
   program: { name: string }[];
+  probability?: number;
   rocket: {
     configuration: {
       name: string;
@@ -57,6 +70,7 @@ export interface ILaunchResult {
     name: string;
     type: string;
     description: string;
+    orbit?: IOrbit;
     agencies: {
       id: string;
       name: string;
@@ -77,13 +91,15 @@ export interface ILaunchResult {
   };
 }
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export async function getLaunches(
   url: string
 ): Promise<{ data: ILaunchResponse | null; error: string | null }> {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
-    if (!rateLimit.canProceed) {
+    if (!rateLimit.canProceed && isProduction) {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
         return { data: cachedData as ILaunchResponse, error: null };
@@ -100,11 +116,15 @@ export async function getLaunches(
 
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
-    await redis.set(url, JSON.stringify(response.data));
-    await redis.expire(url, cacheDuration);
+    if (isProduction) {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
 
     // Update rate limit tracking
-    await updateRateLimitTracking();
+    if (isProduction) {
+      await updateRateLimitTracking();
+    }
 
     return { data: response.data, error: null };
   } catch (error) {
@@ -126,7 +146,7 @@ export async function getLaunchById(url: string) {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
-    if (!rateLimit.canProceed) {
+    if (!rateLimit.canProceed && isProduction) {
       const cachedData = await getCacheForURL(url);
       if (cachedData) {
         return { data: cachedData, error: null };
@@ -139,11 +159,15 @@ export async function getLaunchById(url: string) {
     // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
 
-    await redis.set(url, JSON.stringify(response.data));
-    await redis.expire(url, cacheDuration);
+    if (isProduction) {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
 
     // Update rate limit tracking
-    await updateRateLimitTracking();
+    if (isProduction) {
+      await updateRateLimitTracking();
+    }
 
     return { data: response.data, error: null };
   } catch (error) {
@@ -159,6 +183,84 @@ export async function getLaunchById(url: string) {
     }
     return { data: null, error: 'An error occurred' };
   }
+}
+
+export async function getLastYearSuccessRate() {
+  // Check if the rate is already cached
+  if (isProduction) {
+    const cachedRate = await redis.get('lastYearSuccessRate');
+
+    if (cachedRate) {
+      return cachedRate;
+    }
+  }
+
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - 1);
+
+  // Format dates for API
+  const startDateStr = startDate.toISOString();
+  const endDateStr = endDate.toISOString();
+
+  // First, get total count
+  const countUrl = `${process.env.LL_BASE_URL}/launches/?limit=1&net__gte=${startDateStr}&net__lte=${endDateStr}`;
+  const { data: initialData, error: initialError } =
+    await getLaunches(countUrl);
+
+  if (initialError || !initialData) {
+    throw new Error(initialError || 'Failed to fetch initial launch data');
+  }
+
+  const totalLaunches = initialData.count;
+  const batchSize = 100;
+  const numberOfRequests = Math.ceil(totalLaunches / batchSize);
+
+  let allLaunches: ILaunchResult[] = [];
+
+  // Fetch all launches
+  const requests = Array.from({ length: numberOfRequests }, (_, i) => {
+    const offset = i * batchSize;
+    const url = `${process.env.LL_BASE_URL}/launches/?limit=${batchSize}&offset=${offset}&net__gte=${startDateStr}&net__lte=${endDateStr}&ordering=net`;
+    return getLaunches(url);
+  });
+
+  const results = await Promise.all(requests);
+
+  allLaunches = results.reduce((acc, { data, error }) => {
+    if (error || !data) {
+      console.error('Error fetching batch:', error);
+      return acc;
+    }
+    return [...acc, ...data.results];
+  }, [] as ILaunchResult[]);
+
+  // If we didn't get any launches, throw an error
+  if (allLaunches.length === 0) {
+    throw new Error('No launch data available');
+  }
+
+  // Calculate success rate
+  const successfulLaunches = allLaunches.filter(
+    (launch) => launch.status.name === 'Launch Successful'
+  ).length;
+
+  // Cache the rate in redis for 24 hours
+  await redis.set(
+    'lastYearSuccessRate',
+    JSON.stringify({
+      total: allLaunches.length,
+      successful: successfulLaunches,
+      rate: ((successfulLaunches / allLaunches.length) * 100).toFixed(1),
+    })
+  );
+  await redis.expire('lastYearSuccessRate', 60 * 60 * 24);
+
+  return {
+    total: allLaunches.length,
+    successful: successfulLaunches,
+    rate: ((successfulLaunches / allLaunches.length) * 100).toFixed(1),
+  };
 }
 
 export async function getLaunchStatuses() {

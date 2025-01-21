@@ -6,8 +6,8 @@ import {
 } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { AstronautCard } from '~/components/astronaut-card';
-import { AstronautDetail } from '~/components/astronaut-detail';
+import { AstronautCard } from '~/components/astronauts/astronaut-card';
+import { AstronautDetail } from '~/components/astronauts/astronaut-detail';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -66,10 +66,10 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 export default function AstronautsInSpace() {
   const { astronauts, statuses } = useLoaderData<typeof loader>();
 
-  const [items, setItems] = useState<IAstronaut[]>(astronauts.results);
+  const [items, setItems] = useState<IAstronaut[]>(astronauts?.results || []);
   const [limit, setLimit] = useState(40);
-  const [offset, setOffset] = useState(astronauts.results.length);
-  const [hasMore, setHasMore] = useState(astronauts.next !== null);
+  const [offset, setOffset] = useState(astronauts?.results.length || 0);
+  const [hasMore, setHasMore] = useState(astronauts?.next !== null);
   const [statusId, setStatusId] = useState<string | null>(null);
   const [nationality, setNationality] = useState<string | null>(null);
   const fetcher = useFetcher<typeof loader>();
@@ -91,10 +91,10 @@ export default function AstronautsInSpace() {
         setHasMore(false);
         return;
       }
-      if (fetcher.data.astronauts.next === null) {
+      if (fetcher.data?.astronauts?.next === null) {
         setHasMore(false);
       } else {
-        const url = new URL(fetcher.data.astronauts.next);
+        const url = new URL(fetcher.data?.astronauts?.next || '');
         const offset = url.searchParams.get('offset') || '0';
         const limit = url.searchParams.get('limit') || '40';
         setOffset(Number(offset));

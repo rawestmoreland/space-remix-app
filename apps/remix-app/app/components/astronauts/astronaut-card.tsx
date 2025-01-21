@@ -1,8 +1,9 @@
-import { Card, CardContent, CardFooter } from './ui/card';
-import { Badge } from './ui/badge';
+import { Card, CardContent, CardFooter } from '../ui/card';
+import { Badge } from '../ui/badge';
 import { IAstronaut } from '~/services/astronautService';
 import { useMemo } from 'react';
 import { Orbit } from 'lucide-react';
+import { Link } from '@remix-run/react';
 
 export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
   const status = useMemo(() => {
@@ -20,8 +21,6 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
     return 'default';
   }, [astronaut.status.name]);
 
-  console.log(astronaut.image);
-
   return (
     <Card className='group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg'>
       <div className='relative h-48 overflow-hidden bg-muted'>
@@ -38,9 +37,14 @@ export function AstronautCard({ astronaut }: { astronaut: IAstronaut }) {
         />
       </div>
       <CardContent className='flex-grow p-4'>
-        <h3 className='mb-2 line-clamp-2 text-xl font-bold'>
-          {astronaut.name}
-        </h3>
+        <Link
+          to={`/astronaut/${astronaut.id}`}
+          className='hover:underline, decoration-primary'
+        >
+          <h3 className='mb-2 line-clamp-2 text-xl font-bold'>
+            {astronaut.name}
+          </h3>
+        </Link>
         <Badge variant={status}>
           {astronaut.status?.name ?? 'Unknown Status'}
         </Badge>

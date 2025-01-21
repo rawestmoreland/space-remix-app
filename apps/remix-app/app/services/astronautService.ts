@@ -28,12 +28,65 @@ export interface IAstronaut {
   social_media_links: { social_media: { name: string }; url: string }[];
 }
 
+export interface IAstronautResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: IAstronaut[];
+  error: string | null;
+}
+
 export interface IAstronautStatus {
   id: number;
   name: string;
 }
 
-export async function getAstronauts(url: string) {
+export async function getAstronauts(
+  url: string
+): Promise<{ data: IAstronautResponse | null; error: string | null }> {
+  try {
+    // Add rate limiting check
+    const rateLimit = await checkRateLimit();
+    if (!rateLimit.canProceed && process.env.NODE_ENV === 'production') {
+      const cachedData = await getCacheForURL(url);
+      if (cachedData) {
+        return { data: cachedData as IAstronautResponse, error: null };
+      }
+      return { data: null, error: 'Rate limit exceeded. Try again later.' };
+    }
+
+    const response = await launchListRequest(url, process.env.LL_API_KEY!);
+
+    // Get cache duration
+    const cacheDuration = getCacheDuration(url);
+
+    if (process.env.NODE_ENV === 'production') {
+      await redis.set(url, JSON.stringify(response.data));
+      await redis.expire(url, cacheDuration);
+    }
+
+    // Update rate limit tracking
+    if (process.env.NODE_ENV === 'production') {
+      await updateRateLimitTracking();
+    }
+
+    return { data: response.data, error: null };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      return {
+        data: null,
+        error:
+          (axiosError.response?.data as string) ||
+          axiosError.message ||
+          'An error occurred',
+      };
+    }
+    return { data: null, error: 'An error occurred' };
+  }
+}
+
+export async function getAstronautById(url: string) {
   try {
     // Add rate limiting check
     const rateLimit = await checkRateLimit();
@@ -47,7 +100,7 @@ export async function getAstronauts(url: string) {
 
     const response = await launchListRequest(url, process.env.LL_API_KEY!);
 
-    // Get cache duration
+    // Cache the response with appropriate duration
     const cacheDuration = getCacheDuration(url);
 
     if (process.env.NODE_ENV === 'production') {
