@@ -342,3 +342,14 @@ export async function getNextLaunchByLocation(
     return { data: null, error: 'An error occurred' };
   }
 }
+
+export async function getLaunchesByLocation(
+  location: number,
+  offset: string = '0',
+  limit: string = '40'
+) {
+  const today = new Date().toISOString();
+  const url = `${process.env.LL_BASE_URL}/launches/upcoming?pad__location=${location}&ordering=net&net__gte=${today}&offset=${offset}&limit=${limit}`;
+  const { data, error } = await getLaunches(url);
+  return { data, error };
+}

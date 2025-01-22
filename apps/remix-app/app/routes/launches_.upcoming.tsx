@@ -3,6 +3,7 @@ import {
   useFetcher,
   useLoaderData,
   json,
+  useSearchParams,
 } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -10,6 +11,7 @@ import { LaunchCard } from '~/components/launches';
 import { TypographyH1, TypographyMuted } from '~/components/ui/typography';
 import {
   getLaunches,
+  getLaunchesByLocation,
   ILaunchResponse,
   ILaunchResult,
 } from '~/services/launchService';
@@ -28,22 +30,47 @@ export async function loader({ request }: ClientLoaderFunctionArgs) {
 
   queryURL.searchParams.append('offset', offset);
   queryURL.searchParams.append('limit', limit);
-  queryURL.searchParams.append('ordering', 'net');
 
-  const { data, error } = await getLaunches(queryURL.toString());
-  if (error) {
-    throw json({ error }, { status: 500 });
-  }
-  return json(
-    { launches: data as ILaunchResponse },
-    {
-      headers: { 'Set-Cookie': await commitUrlSession(session) },
+  const location = url.searchParams.get('location');
+
+  if (location) {
+    const { data, error } = await getLaunchesByLocation(
+      Number(location),
+      offset,
+      limit
+    );
+    if (error) {
+      throw json({ error }, { status: 500 });
     }
-  );
+    return json(
+      { launches: data as ILaunchResponse },
+      {
+        status: 200,
+        headers: { 'Set-Cookie': await commitUrlSession(session) },
+      }
+    );
+  } else {
+    queryURL.searchParams.append('ordering', 'net');
+
+    const { data, error } = await getLaunches(queryURL.toString());
+    if (error) {
+      throw json({ error }, { status: 500 });
+    }
+    return json(
+      { launches: data as ILaunchResponse },
+      {
+        status: 200,
+        headers: { 'Set-Cookie': await commitUrlSession(session) },
+      }
+    );
+  }
 }
 
 export default function UpcomingLaunches() {
   const { launches } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+
+  const hasLocation = searchParams.has('location');
 
   const [items, setItems] = useState<ILaunchResult[]>(launches.results);
   const [limit, setLimit] = useState(40);
@@ -86,7 +113,11 @@ export default function UpcomingLaunches() {
       (entries) => {
         const first = entries[0];
         if (first.isIntersecting && hasMore && fetcher.state === 'idle') {
-          fetcher.load(`/launches/upcoming?offset=${offset}&limit=${limit}`);
+          fetcher.load(
+            `/launches/upcoming&offset=${offset}&limit=${limit}${
+              hasLocation ? `&location=${location}` : ''
+            }`
+          );
         }
       },
       { threshold: 1 }
@@ -97,7 +128,7 @@ export default function UpcomingLaunches() {
     }
 
     return () => observer.disconnect();
-  }, [hasMore, offset, limit, fetcher]);
+  }, [hasMore, offset, limit, fetcher, hasLocation]);
 
   return (
     <main className='flex-1'>

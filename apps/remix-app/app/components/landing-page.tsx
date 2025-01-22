@@ -562,9 +562,11 @@ const LandingPage = ({
                       </div>
 
                       <div className='flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0'>
-                        <span className='text-sm font-medium mr-1'>
-                          View launches
-                        </span>
+                        <Link to={`/launches/upcoming?location=${facility.id}`}>
+                          <span className='text-sm font-medium mr-1'>
+                            View launches
+                          </span>
+                        </Link>
                         <ArrowRight className='h-4 w-4' />
                       </div>
                     </CardContent>
