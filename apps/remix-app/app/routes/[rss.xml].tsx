@@ -3,6 +3,7 @@ import { LoaderFunction } from '@remix-run/node';
 import { prisma } from '~/db.server';
 
 export type RssPost = {
+  id: string;
   title: string;
   link: string;
   description: string;
@@ -73,20 +74,18 @@ export function generateRss({
     .map((post) => {
       const postDate = new Date(post.pubDate);
       return `
-          <item>
-            <title>${escapeXml(post.title)}</title>
-            <description>${escapeXml(post.description)}</description>
-            <pubDate>${postDate.toUTCString().replace('GMT', 'GMT')}</pubDate>
-            <atom:published>${postDate.toISOString()}</atom:published>
-            <atom:updated>${postDate.toISOString()}</atom:updated>
-            <link>https://launchlist.space/summary/${escapeXml(post.slug)}</link>
-            <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
-            <content:encoded><![CDATA[${post.content}]]></content:encoded>
-            <guid isPermaLink="false">https://launchlist.space/post/${escapeXml(post.slug)}</guid>
-            <category>Space</category>
-            <source url="https://launchlist.space">The Launch List</source>
-            <comments>https://launchlist.space/summary/${escapeXml(post.slug)}#comments</comments>
-          </item>`;
+  <item>
+    <title>${escapeXml(post.title)}</title>
+    <description>${escapeXml(post.description)}</description>
+    <pubDate>${postDate.toUTCString().replace('GMT', '+0000')}</pubDate>
+    <link>https://launchlist.space/summary/${escapeXml(post.slug)}</link>
+    <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
+    <content:encoded><![CDATA[${post.content}]]></content:encoded>
+    <guid isPermaLink="false">${post.id}</guid>
+    <category>Space</category>
+    <source url="https://launchlist.space">The Launch List</source>
+    <comments>https://launchlist.space/summary/${escapeXml(post.slug)}#comments</comments>
+  </item>`;
     })
     .join('\n');
 
