@@ -61,7 +61,7 @@ export const loader = async () => {
       brownsvilleLocationData,
     ] = await Promise.all([
       getLaunches(
-        `${process.env.LL_BASE_URL}/launches/upcoming?net__gte=${lastSundayString}&net__lte=${nextSundayString}`
+        `${process.env.LL_BASE_URL}/launches?net__gte=${lastSundayString}&net__lte=${nextSundayString}`
       ),
       getLaunches(`${process.env.LL_BASE_URL}/launches?ordering=net`),
       getAstronauts(
