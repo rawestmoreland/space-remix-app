@@ -112,6 +112,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       'The latest posts from The Launch List. Weekly updates on space launches, astronauts, and more.',
     link: 'https://launchlist.space',
     posts: posts.map((post: NewsletterPost) => ({
+      id: post.id.toString(),
       title: post.title,
       link: `https://launchlist.space/post/${post.slug}`,
       description: post.description ?? '',
