@@ -33,6 +33,10 @@ function escapeXml(unsafe: string): string {
   });
 }
 
+function encodeHtmlEntities(content: string): string {
+  return content.replace(/&(?!(?:amp|lt|gt|quot|apos);)/g, '&amp;');
+}
+
 export function generateRss({
   description,
   posts,
@@ -62,7 +66,6 @@ export function generateRss({
         <lastBuildDate>${utcString}</lastBuildDate>
         <pubDate>${utcString}</pubDate>
         <atom:updated>${isoString}</atom:updated>
-        <atom:published>${isoString}</atom:published>
         <category>Space</category>
         <category>Astronomy</category>
         <category>Science</category>`;
@@ -80,7 +83,7 @@ export function generateRss({
     <pubDate>${postDate.toUTCString().replace('GMT', '+0000')}</pubDate>
     <link>https://launchlist.space/summary/${escapeXml(post.slug)}</link>
     <dc:creator>${escapeXml(post.author ?? 'Richard W.')}</dc:creator>
-    <content:encoded><![CDATA[${post.content}]]></content:encoded>
+    <content:encoded><![CDATA[${encodeHtmlEntities(post.content)}]]></content:encoded>
     <guid isPermaLink="false">${post.id}</guid>
     <category>Space</category>
     <source url="https://launchlist.space">The Launch List</source>
