@@ -2,8 +2,8 @@
 
 ARG APP_DIRNAME=remix-app
 ARG APP_PKG_NAME=@repo/remix-app
-
-FROM node:20-bookworm-slim AS pruner
+# Pin to a specific version instead of using the -slim tag
+FROM node:20.9.0-bookworm-slim AS pruner
 ARG APP_PKG_NAME
 RUN apt-get update && apt-get install -y openssl
 WORKDIR /app
@@ -12,10 +12,9 @@ COPY . .
 RUN turbo prune --scope=$APP_PKG_NAME --docker
 RUN find . -name "node_modules" -type d -prune -exec rm -rf '{}' +
 
-FROM node:20-bookworm-slim AS base
+FROM node:20.9.0-bookworm-slim AS base
 RUN apt-get update && apt-get install -y openssl
-# Replace corepack with direct pnpm installation
-RUN npm install -g pnpm@latest
+RUN corepack enable
 WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
@@ -24,18 +23,19 @@ COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 FROM base AS dev-deps
 WORKDIR /app
-RUN pnpm install --no-verify-store
+RUN pnpm install
 
 FROM base AS production-deps
 WORKDIR /app
 ENV NODE_ENV production
-RUN pnpm install --prod --no-verify-store
+RUN pnpm install --prod
 COPY --from=pruner /app/out/full/packages/database/prisma/schema.prisma /app/packages/database/prisma/schema.prisma
 RUN pnpm dlx prisma generate --schema /app/packages/database/prisma/schema.prisma
 
 FROM base AS builder
 ARG APP_PKG_NAME
 WORKDIR /app
+RUN corepack enable
 ENV NODE_ENV production
 COPY --from=pruner /app/out/full/ .
 COPY --from=dev-deps /app/ .
