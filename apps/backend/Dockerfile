@@ -12,7 +12,8 @@ RUN find . -name "node_modules" -type d -prune -exec rm -rf '{}' +
 
 FROM node:20-bookworm-slim AS base
 RUN apt-get update && apt-get install -y openssl
-RUN corepack enable
+# Install pnpm directly instead of using corepack
+RUN npm install -g pnpm@9.11.0
 WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
@@ -21,11 +22,15 @@ COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 FROM base as dev-deps
 WORKDIR /app
+# Add .npmrc to prevent corepack usage
+RUN echo "use-node-version=20.18.3" > .npmrc
 RUN pnpm install
 
 FROM base as production-deps
 WORKDIR /app
 ENV NODE_ENV production
+# Add .npmrc to prevent corepack usage
+RUN echo "use-node-version=20.18.3" > .npmrc
 RUN pnpm install
 COPY --from=pruner /app/out/full/packages/database/prisma/schema.prisma /app/packages/database/prisma/schema.prisma
 RUN pnpm dlx prisma generate --schema /app/packages/database/prisma/schema.prisma
@@ -33,7 +38,6 @@ RUN pnpm dlx prisma generate --schema /app/packages/database/prisma/schema.prism
 FROM base as builder
 ARG APP_PKG_NAME
 WORKDIR /app
-RUN corepack enable
 ENV NODE_ENV production
 COPY --from=pruner /app/out/full/ .
 COPY --from=dev-deps /app/ .
@@ -43,9 +47,7 @@ RUN pnpm run build --filter=$APP_PKG_NAME...
 
 FROM base as runner
 ARG APP_DIRNAME
-
 ENV NODE_ENV production
-
 WORKDIR /app
 
 COPY --from=pruner /app/out/full/ .
@@ -54,8 +56,6 @@ COPY --from=builder /app/apps/$APP_DIRNAME/dist ./apps/$APP_DIRNAME/dist
 
 WORKDIR /app/apps/$APP_DIRNAME
 
-# Expose port 8080
 EXPOSE 8080
 
-# Start the app
 CMD ["pnpm", "run", "start"]
