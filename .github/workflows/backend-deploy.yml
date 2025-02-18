@@ -36,12 +36,22 @@ jobs:
         with:
           version: 9.11.0
 
+      # Add this step to create store directory
+      - name: Setup pnpm cache
+        shell: bash
+        run: |
+          mkdir -p ~/.pnpm-store
+
       - name: 🟢 Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-          cache-dependency-path: '**/pnpm-lock.yaml'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      # Add a step to install dependencies
+      - name: Install Dependencies
+        run: pnpm install
 
       - name: 👀 Read app name
         uses: SebRollen/toml-action@v1.2.0
