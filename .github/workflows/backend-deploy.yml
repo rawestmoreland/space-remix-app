@@ -41,6 +41,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: 👀 Read app name
         uses: SebRollen/toml-action@v1.2.0
@@ -85,6 +86,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: 💨 Install turbo
         run: pnpm add -g turbo
