@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { prisma } from '@/prisma';
-import { logger, schedules } from '@trigger.dev/sdk/v3';
+import { logger, retry, schedules } from '@trigger.dev/sdk/v3';
 import { extractArticleSummary, extractCategory } from '@/common/utils/regex';
 
 const anthropic = new Anthropic();
@@ -12,11 +12,21 @@ export const checkAIBatches = schedules.task({
   maxDuration: 600, // 10 minutes
   run: async (payload, { ctx }) => {
     // Check for Anthropic AI batches that are still processing
-    const unprocessedBatches = await prisma.aIBatch.findMany({
-      where: {
-        processingStatus: 'in_progress',
+    const unprocessedBatches = await retry.onThrow(
+      async ({ attempt }) => {
+        const batches = await prisma.aIBatch.findMany({
+          where: {
+            processingStatus: 'in_progress',
+          },
+        });
+
+        return batches;
       },
-    });
+      {
+        maxAttempts: 3,
+        randomize: false,
+      }
+    );
 
     // If there are no unprocessed batches, return
     if (!unprocessedBatches) {
