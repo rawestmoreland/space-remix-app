@@ -44,7 +44,7 @@ export function LaunchCard({ launch }: { launch: ILaunchResult }) {
         </div>
       </div>
 
-      <CardContent className='flex-grow p-4'>
+      <CardContent className='relative flex-grow p-4'>
         <Link
           to={`/launch/${launch.id}`}
           className='hover:underline decoration-primary'
@@ -81,21 +81,21 @@ export function LaunchCard({ launch }: { launch: ILaunchResult }) {
         </div>
 
         <div className='relative'>
-          <p className='line-clamp-3 text-sm'>
+          <p className='line-clamp-3 text-sm mb-6'>
             {launch.mission?.description ||
               'Mission details are not available at this time.'}
           </p>
-          {launch.mission?.description && (
-            <div className='absolute bottom-0 right-0 bg-gradient-to-l from-background to-transparent px-2'>
-              <Link
-                to={`/launch/${launch.id}`}
-                className='text-xs text-primary hover:underline'
-              >
-                Read more
-              </Link>
-            </div>
-          )}
         </div>
+        {launch.mission?.description && (
+          <div className='absolute bottom-2 right-2 bg-gradient-to-l from-background to-transparent px-2'>
+            <Link
+              to={`/launch/${launch.id}`}
+              className='text-xs text-primary hover:underline'
+            >
+              Read more
+            </Link>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className='bg-background flex flex-col gap-2 pt-4 items-start'>
